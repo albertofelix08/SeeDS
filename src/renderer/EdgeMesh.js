@@ -12,7 +12,7 @@
 // =============================================================
 
 import * as THREE from '../../vendor/three/three.module.js';
-import { VISUAL } from './constants.js';
+import { VISUAL } from '../core/constants.js';
 
 
 class EdgeMesh {

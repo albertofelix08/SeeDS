@@ -1,186 +1,203 @@
 // =============================================================
-//  SeeDS — LabelSprite.js
-//  Canvas-texture sprites that float above nodes.
-//  We use THREE.Sprite with a canvas texture because:
-//  - Always faces the camera (billboard)
-//  - No CSS2DRenderer dependency
-//  - Works cleanly with the 3D scene depth
+//  SeeDS — EdgeMesh.js
+//  Draws directed arrows (edges) between nodes.
+//  Each edge = a cylinder shaft + a cone arrowhead.
+//  Edges are rebuilt whenever node positions change.
 //
 //  Usage:
-//    const label = LabelSprite.create('42', scene);
-//    label.setPosition(x, y + VISUAL.LABEL_OFFSET_Y, z);
-//    label.setText('99');   // update value
-//    label.dispose();
+//    const edge = EdgeMesh.create(fromPos, toPos, scene);
+//    edge.update(newFromPos, newToPos);  // reposition
+//    edge.setError(true);                // turn red
+//    edge.dispose();
 // =============================================================
 
 import * as THREE from '../../vendor/three/three.module.js';
-import { VISUAL } from './constants.js';
+import { VISUAL } from '../core/constants.js';
 
 
-// Canvas size for the texture — power of 2 for GPU
-const CANVAS_W = 256;
-const CANVAS_H = 128;
-
-
-class LabelSprite {
-  constructor(text, scene, options = {}) {
+class EdgeMesh {
+  constructor(fromPos, toPos, scene, options = {}) {
     this._scene   = scene;
-    this._text    = String(text);
+    this._fromPos = fromPos.clone();
+    this._toPos   = toPos.clone();
     this._options = {
-      fontSize:   options.fontSize   ?? VISUAL.LABEL_FONT_SIZE,
-      color:      options.color      ?? VISUAL.LABEL_COLOR,
-      scale:      options.scale      ?? 1.4,    // world-space size of the sprite
-      subText:    options.subText    ?? null,   // optional address line below value
+      color:     options.color     ?? VISUAL.EDGE_COLOR,
+      thickness: options.thickness ?? VISUAL.EDGE_THICKNESS,
+      isError:   options.isError   ?? false,
+      isDashed:  options.isDashed  ?? false,   // future use
     };
 
-    this._canvas   = null;
-    this._ctx      = null;
-    this._texture  = null;
-    this._sprite   = null;
+    this._group = new THREE.Group();
+    this._shaft = null;
+    this._head  = null;
 
     this._build();
-    this._scene.add(this._sprite);
+    this._scene.add(this._group);
   }
 
 
   // -----------------------------------------------------------
-  //  Build the canvas, texture and sprite
+  //  Build shaft + arrowhead
   // -----------------------------------------------------------
   _build() {
-    this._canvas = document.createElement('canvas');
-    this._canvas.width  = CANVAS_W;
-    this._canvas.height = CANVAS_H;
-    this._ctx = this._canvas.getContext('2d');
+    const from = this._fromPos;
+    const to   = this._toPos;
 
-    this._texture = new THREE.CanvasTexture(this._canvas);
-    this._texture.colorSpace = THREE.SRGBColorSpace;
+    // Direction and length
+    const dir    = new THREE.Vector3().subVectors(to, from);
+    const length = dir.length();
 
-    const mat = new THREE.SpriteMaterial({
-      map:         this._texture,
-      transparent: true,
-      depthWrite:  false,   // don't occlude things behind the label
-      sizeAttenuation: true,
+    if (length < 0.001) return; // zero-length edge, skip
+
+    const nodeR   = VISUAL.NODE_RADIUS;
+    const headSize = VISUAL.ARROW_HEAD_SIZE;
+
+    // Shorten both ends so the arrow doesn't overlap the spheres
+    const shaftFrom = from.clone().addScaledVector(dir.clone().normalize(), nodeR + 0.05);
+    const shaftTo   = to.clone().addScaledVector(dir.clone().normalize(), -(nodeR + headSize + 0.05));
+    const shaftDir  = new THREE.Vector3().subVectors(shaftTo, shaftFrom);
+    const shaftLen  = shaftDir.length();
+
+    if (shaftLen < 0.01) return;
+
+    const color = this._options.isError ? VISUAL.ERROR_COLOR : this._options.color;
+
+    // -- Shaft (CylinderGeometry, oriented along Y, then rotated) --
+    const shaftGeo = new THREE.CylinderGeometry(
+      this._options.thickness,   // top radius
+      this._options.thickness,   // bottom radius
+      shaftLen,
+      8,                         // radial segments — low poly is fine
+      1
+    );
+    const shaftMat = new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.6,
+      metalness: 0.2,
     });
+    this._shaft = new THREE.Mesh(shaftGeo, shaftMat);
 
-    this._sprite = new THREE.Sprite(mat);
-    this._sprite.scale.setScalar(this._options.scale);
+    // Position at midpoint
+    const mid = new THREE.Vector3().addVectors(shaftFrom, shaftTo).multiplyScalar(0.5);
+    this._shaft.position.copy(mid);
 
-    this._render();
+    // Rotate to align with direction
+    this._alignToDirection(this._shaft, shaftDir.clone().normalize());
+
+    // -- Arrowhead (cone) --
+    const headGeo = new THREE.ConeGeometry(headSize, headSize * 2, 8);
+    const headMat = new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.4,
+      metalness: 0.3,
+    });
+    this._head = new THREE.Mesh(headGeo, headMat);
+
+    // Position at tip end (just before the target node surface)
+    const headPos = to.clone().addScaledVector(dir.clone().normalize(), -(nodeR + 0.05));
+    this._head.position.copy(headPos);
+    this._alignToDirection(this._head, dir.clone().normalize());
+
+    this._group.add(this._shaft);
+    this._group.add(this._head);
+  }
+
+  // Rotate a mesh so its local Y axis points along `dir`
+  _alignToDirection(mesh, dir) {
+    const up = new THREE.Vector3(0, 1, 0);
+    // Handle the case where dir is exactly parallel to up
+    if (Math.abs(dir.dot(up)) > 0.999) {
+      mesh.rotation.set(dir.y < 0 ? Math.PI : 0, 0, 0);
+      return;
+    }
+    const quaternion = new THREE.Quaternion().setFromUnitVectors(up, dir);
+    mesh.setRotationFromQuaternion(quaternion);
   }
 
 
   // -----------------------------------------------------------
-  //  Draw text onto the canvas and update the texture
+  //  Rebuild the edge with new positions
+  //  Called when a node moves (insert/delete animation)
   // -----------------------------------------------------------
-  _render() {
-    const ctx = this._ctx;
-    const w   = CANVAS_W;
-    const h   = CANVAS_H;
+  update(fromPos, toPos) {
+    this._fromPos = fromPos.clone();
+    this._toPos   = toPos.clone();
 
-    // Clear
-    ctx.clearRect(0, 0, w, h);
-
-    // Optional pill background for readability
-    if (this._options.subText) {
-      ctx.fillStyle = 'rgba(10, 10, 20, 0.65)';
-      const pad = 12;
-      const bw  = w * 0.72;
-      const bh  = h * 0.80;
-      const bx  = (w - bw) / 2;
-      const by  = (h - bh) / 2;
-      const r   = 14;
-      ctx.beginPath();
-      ctx.moveTo(bx + r, by);
-      ctx.lineTo(bx + bw - r, by);
-      ctx.quadraticCurveTo(bx + bw, by, bx + bw, by + r);
-      ctx.lineTo(bx + bw, by + bh - r);
-      ctx.quadraticCurveTo(bx + bw, by + bh, bx + bw - r, by + bh);
-      ctx.lineTo(bx + r, by + bh);
-      ctx.quadraticCurveTo(bx, by + bh, bx, by + bh - r);
-      ctx.lineTo(bx, by + r);
-      ctx.quadraticCurveTo(bx, by, bx + r, by);
-      ctx.closePath();
-      ctx.fill();
+    // Remove old meshes
+    if (this._shaft) {
+      this._shaft.geometry.dispose();
+      this._shaft.material.dispose();
+      this._group.remove(this._shaft);
+    }
+    if (this._head) {
+      this._head.geometry.dispose();
+      this._head.material.dispose();
+      this._group.remove(this._head);
     }
 
-    // Main value text
-    ctx.font         = `600 ${this._options.fontSize}px -apple-system, sans-serif`;
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle    = this._options.color;
+    this._shaft = null;
+    this._head  = null;
 
-    const mainY = this._options.subText ? h * 0.38 : h * 0.5;
-    ctx.fillText(this._text, w / 2, mainY);
+    this._build();
+  }
 
-    // Sub text (address / type annotation)
-    if (this._options.subText) {
-      ctx.font      = `400 ${Math.round(this._options.fontSize * 0.46)}px monospace`;
-      ctx.fillStyle = 'rgba(180, 200, 255, 0.75)';
-      ctx.fillText(this._options.subText, w / 2, h * 0.68);
+
+  // -----------------------------------------------------------
+  //  Error state — turn the edge red
+  // -----------------------------------------------------------
+  setError(isError) {
+    this._options.isError = isError;
+    const color = isError ? VISUAL.ERROR_COLOR : this._options.color;
+    if (this._shaft) this._shaft.material.color.setHex(color);
+    if (this._head)  this._head.material.color.setHex(color);
+  }
+
+
+  // -----------------------------------------------------------
+  //  Highlight — used during traversal animation
+  //  A travelling packet will be separate, but the edge itself
+  //  can glow to show the active path
+  // -----------------------------------------------------------
+  setActive(active) {
+    if (this._options.isError) return;
+    const color = active ? 0x7db3ff : this._options.color;
+    const emissiveIntensity = active ? 0.5 : 0;
+    if (this._shaft) {
+      this._shaft.material.color.setHex(color);
+      this._shaft.material.emissiveIntensity = emissiveIntensity;
     }
-
-    // Mark texture as needing GPU upload
-    this._texture.needsUpdate = true;
+    if (this._head) {
+      this._head.material.color.setHex(color);
+      this._head.material.emissiveIntensity = emissiveIntensity;
+    }
   }
-
-
-  // -----------------------------------------------------------
-  //  PUBLIC API
-  // -----------------------------------------------------------
-
-  setText(text) {
-    this._text = String(text);
-    this._render();
-  }
-
-  setSubText(subText) {
-    this._options.subText = subText;
-    this._render();
-  }
-
-  setColor(color) {
-    this._options.color = color;
-    this._render();
-  }
-
-  setPosition(x, y, z) {
-    this._sprite.position.set(x, y, z);
-  }
-
-  setVisible(visible) {
-    this._sprite.visible = visible;
-  }
-
-  // Scale the sprite in world space
-  setScale(s) {
-    this._sprite.scale.setScalar(s);
-  }
-
-  get position() { return this._sprite.position; }
-  get sprite()   { return this._sprite; }
 
 
   // -----------------------------------------------------------
   //  Cleanup
   // -----------------------------------------------------------
   dispose() {
-    this._texture.dispose();
-    this._sprite.material.dispose();
-    this._scene.remove(this._sprite);
-    this._sprite  = null;
-    this._texture = null;
-    this._canvas  = null;
-    this._ctx     = null;
+    if (this._shaft) {
+      this._shaft.geometry.dispose();
+      this._shaft.material.dispose();
+    }
+    if (this._head) {
+      this._head.geometry.dispose();
+      this._head.material.dispose();
+    }
+    this._scene.remove(this._group);
+    this._shaft = null;
+    this._head  = null;
   }
 
 
   // -----------------------------------------------------------
   //  Static factory
   // -----------------------------------------------------------
-  static create(text, scene, options) {
-    return new LabelSprite(text, scene, options);
+  static create(fromPos, toPos, scene, options) {
+    return new EdgeMesh(fromPos, toPos, scene, options);
   }
 }
 
 
-export default LabelSprite;
+export default EdgeMesh;

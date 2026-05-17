@@ -8,7 +8,7 @@
 
 import * as THREE from '../../vendor/three/three.module.js';
 import { OrbitControls } from '../../vendor/three/jsm/controls/OrbitControls.js';
-import { VISUAL, CAMERA } from './constants.js';
+import { VISUAL, CAMERA } from '../core/constants.js';
 
 
 class SceneManager {

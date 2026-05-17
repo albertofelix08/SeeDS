@@ -13,7 +13,7 @@
 // =============================================================
 
 import * as THREE from '../../vendor/three/three.module.js';
-import { VISUAL, ERROR_TYPES } from './constants.js';
+import { VISUAL, ERROR_TYPES } from '../core/constants.js';
 
 
 // Shared geometry and materials across all nodes for performance

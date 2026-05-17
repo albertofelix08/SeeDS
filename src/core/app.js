@@ -10,24 +10,24 @@
 //  then renderer, then structures, then UI.
 // =============================================================
 
-import eventBus           from './core/eventBus.js';
-import { EVENTS, DS_TYPES, APP } from './core/constants.js';
+import eventBus           from './eventBus.js';
+import { EVENTS, DS_TYPES, APP } from './constants.js';
 
-import SceneManager       from './renderer/SceneManager.js';
-import AnimationLoop      from './renderer/AnimationLoop.js';
-import PlaybackController from './renderer/PlaybackController.js';
+import SceneManager       from '../renderer/SceneManager.js';
+import AnimationLoop      from '../renderer/AnimationLoop.js';
+import PlaybackController from '../renderer/PlaybackController.js';
 
-import LinkedList         from './structures/LinkedList.js';
-import BinaryTree         from './structures/BinaryTree.js';
-import ArrayStructure     from './structures/Array.js';
-import SortRace           from './structures/SortRace.js';
+import LinkedList         from '../structures/LinkedList.js';
+import BinaryTree         from '../structures/BinaryTree.js';
+import ArrayStructure     from '../structures/Array.js';
+import SortRace           from '../structures/SortRace.js';
 
-import Toolbar            from './ui/Toolbar.js';
-import PlaybackBar        from './ui/PlaybackBar.js';
-import InfoTooltip        from './ui/InfoTooltip.js';
-import ErrorPanel         from './ui/ErrorPanel.js';
+import Toolbar            from '../ui/Toolbar.js';
+import PlaybackBar        from '../ui/PlaybackBar.js';
+import InfoTooltip        from '../ui/InfoTooltip.js';
+import ErrorPanel         from '../ui/ErrorPanel.js';
 
-import * as THREE         from '../vendor/three/three.module.js';
+import * as THREE         from '../../vendor/three/three.module.js';
 
 
 class App {
@@ -96,6 +96,9 @@ class App {
   //  Per-frame tick
   // -----------------------------------------------------------
   _tick(delta, elapsed) {
+    // Advance playback timer — fires execute(op) when its time
+    this._controller.update(delta);
+
     // Tick the active structure (node animations, error effects)
     if (this._activeStructure) {
       this._activeStructure.tick(delta, elapsed);

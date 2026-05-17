@@ -1,0 +1,29 @@
+{
+  "type": "linked_list",
+  "label": "Linked List — Memory Leak",
+  "schemaVersion": "1.0.0",
+  "nodes": [
+    { "id": "n1", "value": 12, "address": "0x1a2b", "next": "n3",   "error": null },
+    { "id": "n2", "value": 37, "address": "0x1a3c", "next": null,   "error": "memory_leak" },
+    { "id": "n3", "value": 59, "address": "0x1a4d", "next": "n4",   "error": null },
+    { "id": "n4", "value": 81, "address": "0x1a5e", "next": "null", "error": null },
+    { "id": "null", "value": null, "address": null, "next": null,    "error": null }
+  ],
+  "head": "n1",
+  "leakedNodes": ["n2"],
+  "operations": [
+    { "type": "highlight",  "nodeId": "n1" },
+    { "type": "traverse",   "from": "n1",  "to": "n3" },
+    { "type": "traverse",   "from": "n3",  "to": "n4" },
+    { "type": "traverse",   "from": "n4",  "to": "null" },
+    { "type": "leak_show",  "nodeId": "n2", "message": "n2 was removed from the list but free(n2) was never called — 4 bytes leaked" }
+  ],
+  "errors": [
+    {
+      "type": "memory_leak",
+      "nodeId": "n2",
+      "message": "Node n2 (0x1a3c, value=37) was unlinked from the list but never freed. Memory at 0x1a3c is orphaned.",
+      "line": null
+    }
+  ]
+}

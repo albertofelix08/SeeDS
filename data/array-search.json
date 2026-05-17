@@ -1,0 +1,29 @@
+{
+  "type": "array",
+  "label": "Array — Linear Search for 73",
+  "schemaVersion": "1.0.0",
+  "slots": [
+    { "id": "s0", "index": 0, "value": 11, "empty": false, "error": null },
+    { "id": "s1", "index": 1, "value": 28, "empty": false, "error": null },
+    { "id": "s2", "index": 2, "value": 35, "empty": false, "error": null },
+    { "id": "s3", "index": 3, "value": 47, "empty": false, "error": null },
+    { "id": "s4", "index": 4, "value": 56, "empty": false, "error": null },
+    { "id": "s5", "index": 5, "value": 62, "empty": false, "error": null },
+    { "id": "s6", "index": 6, "value": 73, "empty": false, "error": null },
+    { "id": "s7", "index": 7, "value": 89, "empty": false, "error": null },
+    { "id": "s8", "index": 8, "value": 91, "empty": false, "error": null },
+    { "id": "s9", "index": 9, "value": 99, "empty": false, "error": null }
+  ],
+  "length": 10,
+  "searchTarget": 73,
+  "operations": [
+    { "type": "highlight", "slotId": "s0", "message": "Check index 0 → 11. Not 73." },
+    { "type": "highlight", "slotId": "s1", "message": "Check index 1 → 28. Not 73." },
+    { "type": "highlight", "slotId": "s2", "message": "Check index 2 → 35. Not 73." },
+    { "type": "highlight", "slotId": "s3", "message": "Check index 3 → 47. Not 73." },
+    { "type": "highlight", "slotId": "s4", "message": "Check index 4 → 56. Not 73." },
+    { "type": "highlight", "slotId": "s5", "message": "Check index 5 → 62. Not 73." },
+    { "type": "highlight", "slotId": "s6", "message": "Check index 6 → 73. Found! 7 comparisons." }
+  ],
+  "errors": []
+}

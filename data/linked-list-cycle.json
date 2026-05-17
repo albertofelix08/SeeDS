@@ -1,0 +1,32 @@
+{
+  "type": "linked_list",
+  "label": "Linked List — Cycle Detected",
+  "schemaVersion": "1.0.0",
+  "nodes": [
+    { "id": "n1", "value": 12, "address": "0x1a2b", "next": "n2", "error": null },
+    { "id": "n2", "value": 37, "address": "0x1a3c", "next": "n3", "error": "cycle" },
+    { "id": "n3", "value": 59, "address": "0x1a4d", "next": "n4", "error": "cycle" },
+    { "id": "n4", "value": 81, "address": "0x1a5e", "next": "n2", "error": "cycle" }
+  ],
+  "head": "n1",
+  "cycleEntry": "n2",
+  "operations": [
+    { "type": "highlight",    "nodeId": "n1" },
+    { "type": "traverse",     "from": "n1",  "to": "n2" },
+    { "type": "traverse",     "from": "n2",  "to": "n3" },
+    { "type": "traverse",     "from": "n3",  "to": "n4" },
+    { "type": "traverse",     "from": "n4",  "to": "n2" },
+    { "type": "traverse",     "from": "n2",  "to": "n3" },
+    { "type": "traverse",     "from": "n3",  "to": "n4" },
+    { "type": "traverse",     "from": "n4",  "to": "n2" },
+    { "type": "cycle_detect", "nodes": ["n2", "n3", "n4"], "message": "Cycle detected — pointer loops back to n2 (0x1a3c). This will run forever." }
+  ],
+  "errors": [
+    {
+      "type": "cycle",
+      "nodeId": "n4",
+      "message": "n4 → next points back to n2, creating an infinite loop",
+      "line": null
+    }
+  ]
+}

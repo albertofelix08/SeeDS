@@ -1,0 +1,24 @@
+{
+  "type": "binary_tree",
+  "label": "Binary Search Tree — Search for 23",
+  "schemaVersion": "1.0.0",
+  "nodes": [
+    { "id": "n1", "value": 40, "address": "0x2a10", "left": "n2",   "right": "n3",  "error": null },
+    { "id": "n2", "value": 20, "address": "0x2a20", "left": "n4",   "right": "n5",  "error": null },
+    { "id": "n3", "value": 60, "address": "0x2a30", "left": "n6",   "right": "n7",  "error": null },
+    { "id": "n4", "value": 10, "address": "0x2a40", "left": null,   "right": null,  "error": null },
+    { "id": "n5", "value": 23, "address": "0x2a50", "left": null,   "right": null,  "error": null },
+    { "id": "n6", "value": 50, "address": "0x2a60", "left": null,   "right": null,  "error": null },
+    { "id": "n7", "value": 70, "address": "0x2a70", "left": null,   "right": null,  "error": null }
+  ],
+  "root": "n1",
+  "searchTarget": 23,
+  "operations": [
+    { "type": "highlight", "nodeId": "n1", "message": "Start at root: 40. Is 23 < 40? Yes → go left" },
+    { "type": "traverse",  "from": "n1",  "to": "n2" },
+    { "type": "highlight", "nodeId": "n2", "message": "At 20. Is 23 > 20? Yes → go right" },
+    { "type": "traverse",  "from": "n2",  "to": "n5" },
+    { "type": "highlight", "nodeId": "n5", "message": "Found 23! Search complete in 3 steps." }
+  ],
+  "errors": []
+}

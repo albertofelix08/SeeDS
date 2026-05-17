@@ -1,0 +1,30 @@
+{
+  "type": "linked_list",
+  "label": "Linked List — Dangling Pointer",
+  "schemaVersion": "1.0.0",
+  "nodes": [
+    { "id": "n1", "value": 12, "address": "0x1a2b", "next": "n2",   "error": null },
+    { "id": "n2", "value": 37, "address": "0x1a3c", "next": "n4",   "error": null },
+    { "id": "n3", "value": 59, "address": "0x1a4d", "next": "n4",   "error": "dangling_pointer" },
+    { "id": "n4", "value": 81, "address": "0x1a5e", "next": "n5",   "error": null },
+    { "id": "n5", "value": 94, "address": "0x1a6f", "next": "null", "error": null },
+    { "id": "null", "value": null, "address": null, "next": null,    "error": null }
+  ],
+  "head": "n1",
+  "operations": [
+    { "type": "highlight", "nodeId": "n1" },
+    { "type": "traverse",  "from": "n1",  "to": "n2" },
+    { "type": "traverse",  "from": "n2",  "to": "n4" },
+    { "type": "traverse",  "from": "n4",  "to": "n5" },
+    { "type": "traverse",  "from": "n5",  "to": "null" },
+    { "type": "flag_error","nodeId": "n3", "errorType": "dangling_pointer", "message": "n3 is unreachable — nothing in the list points to it" }
+  ],
+  "errors": [
+    {
+      "type": "dangling_pointer",
+      "nodeId": "n3",
+      "message": "Node n3 (0x1a4d, value=59) has no incoming reference. It exists in memory but is unreachable from head.",
+      "line": null
+    }
+  ]
+}

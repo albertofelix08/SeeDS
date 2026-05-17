@@ -1,0 +1,28 @@
+# Dependencies (if you ever add a build step)
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Build output (Phase 4+ only)
+dist/
+
+# LLM model files (Phase 4 — too large for git)
+models/
+*.onnx
+*.bin
+*.gguf
+
+# Local dev overrides
+.env
+.env.local

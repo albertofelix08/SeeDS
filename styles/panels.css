@@ -1,0 +1,280 @@
+/* =============================================================
+   SeeDS — panels.css
+   Playback bar (bottom) + Error panel (right side).
+   ============================================================= */
+
+
+/* =============================================================
+   PLAYBACK BAR
+   ============================================================= */
+
+.playback-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  height: 100%;
+  background: rgba(15,15,19,0.88);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+
+/* Control buttons group */
+.playback-bar__controls {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.playback-bar__btn {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+
+.playback-bar__btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-active);
+}
+
+.playback-bar__play {
+  width: 40px;
+  background: rgba(79,142,247,0.15);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+.playback-bar__play:hover:not(:disabled) {
+  background: rgba(79,142,247,0.28);
+}
+
+
+/* Progress area */
+.playback-bar__progress-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.playback-bar__counter {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 44px;
+  text-align: right;
+}
+
+.playback-bar__progress {
+  flex: 1;
+  height: 4px;
+  background: var(--bg-raised);
+  border-radius: 2px;
+  overflow: hidden;
+  min-width: 60px;
+}
+
+.playback-bar__fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 200ms ease;
+}
+
+
+/* Speed buttons */
+.playback-bar__speeds {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.playback-bar__speed-label {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-right: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.playback-bar__speed-btn {
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+
+.playback-bar__speed-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.playback-bar__speed-btn--active {
+  background: rgba(79,142,247,0.15);
+  border-color: var(--accent);
+  color: var(--accent-hover);
+}
+
+
+/* =============================================================
+   ERROR PANEL
+   ============================================================= */
+
+.error-panel {
+  background: rgba(15,15,19,0.88);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+  transition: border-color var(--transition);
+}
+
+.error-panel--has-errors {
+  border-color: rgba(255,51,51,0.3);
+}
+
+
+/* Header */
+.error-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+
+.error-panel__title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.error-panel--has-errors .error-panel__title {
+  color: var(--error);
+}
+
+.error-panel__collapse {
+  font-size: 14px;
+  color: var(--text-dim);
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.error-panel__collapse:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+
+/* Body */
+.error-panel__body {
+  max-height: 340px;
+  overflow-y: auto;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+
+/* Empty state */
+.error-panel__empty {
+  padding: 16px 12px;
+  text-align: center;
+  color: var(--success);
+  font-size: 12px;
+}
+
+
+/* Error item */
+.error-panel__item {
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  border-left: 3px solid var(--err-color, var(--error));
+  background: rgba(255,51,51,0.05);
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.error-panel__item:hover {
+  background: rgba(255,51,51,0.1);
+  border-color: rgba(255,51,51,0.2);
+}
+
+.error-panel__item--selected {
+  background: rgba(255,51,51,0.14);
+  border-color: rgba(255,51,51,0.35);
+}
+
+.error-panel__item-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.error-panel__item-icon {
+  font-size: 13px;
+  color: var(--err-color, var(--error));
+  flex-shrink: 0;
+}
+
+.error-panel__item-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  flex: 1;
+}
+
+.error-panel__item-node {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.error-panel__item-msg {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.error-panel__item-line {
+  margin-top: 4px;
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+}

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SeeDS — Data Structure Visualizer</title>
+  <meta name="description" content="Visualize data structures and their bugs in 3D. Code in, animation out." />
+
+  <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+  <link rel="stylesheet" href="./styles/main.css" />
+  <link rel="stylesheet" href="./styles/toolbar.css" />
+  <link rel="stylesheet" href="./styles/panels.css" />
+</head>
+
+<body>
+
+  <!-- TOP BAR -->
+  <div id="toolbar"></div>
+
+  <!-- MAIN CANVAS — Three.js renders here -->
+  <canvas id="seeds-canvas"></canvas>
+
+  <!-- ERROR PANEL — right side, collapsible -->
+  <div id="error-panel"></div>
+
+  <!-- BOTTOM PLAYBACK BAR -->
+  <div id="playback-bar"></div>
+
+  <!-- Entry point — ES module, everything imports from here -->
+  <script type="module" src="./src/core/app.js"></script>
+
+</body>
+</html>

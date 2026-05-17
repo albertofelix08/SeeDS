@@ -18,8 +18,8 @@ import { VISUAL } from '../core/constants.js';
 class EdgeMesh {
   constructor(fromPos, toPos, scene, options = {}) {
     this._scene   = scene;
-    this._fromPos = fromPos.clone();
-    this._toPos   = toPos.clone();
+    this._fromPos = new THREE.Vector3(fromPos.x, fromPos.y, fromPos.z);
+    this._toPos   = new THREE.Vector3(toPos.x, toPos.y, toPos.z);
     this._options = {
       color:     options.color     ?? VISUAL.EDGE_COLOR,
       thickness: options.thickness ?? VISUAL.EDGE_THICKNESS,
@@ -120,8 +120,8 @@ class EdgeMesh {
   //  Called when a node moves (insert/delete animation)
   // -----------------------------------------------------------
   update(fromPos, toPos) {
-    this._fromPos = fromPos.clone();
-    this._toPos   = toPos.clone();
+    this._fromPos = new THREE.Vector3(fromPos.x, fromPos.y, fromPos.z);
+    this._toPos   = new THREE.Vector3(toPos.x, toPos.y, toPos.z);
 
     // Remove old meshes
     if (this._shaft) {

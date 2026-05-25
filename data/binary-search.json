@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "array",
+  "label": "Binary Search on Sorted Array",
+  "length": 8,
+  "slots": [
+    { "id": "s0", "index": 0, "value": 3, "empty": false },
+    { "id": "s1", "index": 1, "value": 9, "empty": false },
+    { "id": "s2", "index": 2, "value": 10, "empty": false },
+    { "id": "s3", "index": 3, "value": 27, "empty": false },
+    { "id": "s4", "index": 4, "value": 38, "empty": false },
+    { "id": "s5", "index": 5, "value": 43, "empty": false },
+    { "id": "s6", "index": 6, "value": 73, "empty": false },
+    { "id": "s7", "index": 7, "value": 82, "empty": false }
+  ],
+  "operations": [
+    { "type": "highlight", "slotId": "s3", "note": "mid=3, target=73 > 27, search right" },
+    { "type": "highlight", "slotId": "s5", "note": "mid=5, target=73 > 43, search right" },
+    { "type": "highlight", "slotId": "s6", "note": "mid=6, target=73 == 73, found!" }
+  ]
+}

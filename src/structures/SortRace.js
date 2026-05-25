@@ -49,10 +49,10 @@ class SortRace {
       const bars   = [];
       const labels = [];
 
-      // Build the bars
+      // Build the bars — each bar stores its initial height for scaling
       for (let i = 0; i < n; i++) {
-        const h   = (vals[i] / maxV) * LAYOUT.SORT_BAR_MAX_HEIGHT;
-        const geo = new THREE.BoxGeometry(LAYOUT.BAR_WIDTH, h, LAYOUT.BAR_WIDTH);
+        const h   = Math.max(0.1, (vals[i] / maxV) * LAYOUT.SORT_BAR_MAX_HEIGHT);
+        const geo = new THREE.BoxGeometry(LAYOUT.BAR_WIDTH, 1, LAYOUT.BAR_WIDTH);
         const mat = new THREE.MeshStandardMaterial({
           color:    VISUAL.BAR_COLOR_DEFAULT,
           emissive: 0x1a3a6e,
@@ -61,19 +61,21 @@ class SortRace {
           metalness: 0.3,
         });
         const mesh = new THREE.Mesh(geo, mat);
+        // Scale y instead of recreating geometry — much smoother
+        mesh.scale.y = h;
         mesh.position.set(barsStartX + i * barStep, h / 2, si * 0.1);
         mesh.castShadow = true;
         this._scene.add(mesh);
         bars.push(mesh);
 
         const lbl = LabelSprite.create(String(vals[i]), this._scene);
-        lbl.setPosition(barsStartX + i * barStep, h + 0.5, si * 0.1);
+        lbl.setPosition(barsStartX + i * barStep, h + 0.7, si * 0.2);
         labels.push(lbl);
       }
 
-      // Sorter title below the bars
-      const title = LabelSprite.create(`${sorter.label}  ${sorter.complexity}`, this._scene);
-      title.setPosition(centreX, -1.5, 0);
+      // Sorter title below the bars — store separately so _rebuildBars doesn't touch it
+      const title = LabelSprite.create(`${sorter.label} (${sorter.complexity})`, this._scene);
+      title.setPosition(centreX, -1.5, si * 0.2);
       labels.push(title);
 
       this._sorters.set(sorter.id, {
@@ -90,8 +92,7 @@ class SortRace {
 
     // -----------------------------------------------------------
     //  Synthesise a flat operations array for PlaybackController.
-    //  Round-robin: take one step from each sorter per "tick"
-    //  until all sorters are exhausted.
+    //  Each tick advances ALL sorters by one step simultaneously.
     // -----------------------------------------------------------
     const maxSteps = Math.max(...data.sorters.map(s => s.steps.length));
     this.operations = [];
@@ -101,6 +102,8 @@ class SortRace {
 
     // Patch data so PlaybackController.load() picks them up
     data.operations = this.operations;
+    // Auto-play flag for app.js to start playback immediately
+    data._autoPlay = true;
   }
 
 
@@ -202,22 +205,24 @@ class SortRace {
 
 
   // -----------------------------------------------------------
-  //  Rebuild bar heights + label positions from a state array
+  //  Update bar heights + label positions from a state array
+  //  Uses scale.y instead of recreating geometry — smooth & fast
   // -----------------------------------------------------------
   _rebuildBars(sorter, state) {
     const { bars, labels, barsStartX, barStep, maxV } = sorter;
 
     state.forEach((val, i) => {
       if (!bars[i]) return;
-      const h = (val / maxV) * LAYOUT.SORT_BAR_MAX_HEIGHT;
+      const h = Math.max(0.1, (val / maxV) * LAYOUT.SORT_BAR_MAX_HEIGHT);
 
-      bars[i].geometry.dispose();
-      bars[i].geometry = new THREE.BoxGeometry(LAYOUT.BAR_WIDTH, h, LAYOUT.BAR_WIDTH);
+      // Scale instead of recreating geometry
+      bars[i].scale.y = h;
       bars[i].position.y = h / 2;
 
-      // Update label position and text
+      // Update label position and text (Z offset from the bar's position)
       if (labels[i]) {
-        labels[i].setPosition(barsStartX + i * barStep, h + 0.5, 0);
+        const zOffset = bars[i]?.position?.z ?? 0;
+        labels[i].setPosition(barsStartX + i * barStep, h + 0.7, zOffset);
         labels[i].setText(String(val));
       }
     });
@@ -240,6 +245,9 @@ class SortRace {
       });
     }
   }
+
+
+
 
 
   // -----------------------------------------------------------

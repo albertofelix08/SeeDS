@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./styles/main.css" />
   <link rel="stylesheet" href="./styles/toolbar.css" />
   <link rel="stylesheet" href="./styles/panels.css" />
+  <link rel="stylesheet" href="./styles/code-panel.css" />
 </head>
 
 <body>
@@ -17,14 +18,26 @@
   <!-- TOP BAR -->
   <div id="toolbar"></div>
 
+  <!-- CODE PANEL — left side, 40% width, code analyzer -->
+  <div id="code-panel"></div>
+
   <!-- MAIN CANVAS — Three.js renders here -->
   <canvas id="seeds-canvas"></canvas>
 
   <!-- ERROR PANEL — right side, collapsible -->
   <div id="error-panel"></div>
 
+  <!-- STATUS BAR — below toolbar, above canvas -->
+  <div id="status-bar"></div>
+
   <!-- BOTTOM PLAYBACK BAR -->
   <div id="playback-bar"></div>
+
+  <!-- LOADING OVERLAY — visible while app initializes -->
+  <div id="app-loading" class="app-loading">
+    <div class="app-loading__spinner"></div>
+    <div class="app-loading__text">Loading SeeDS…</div>
+  </div>
 
   <!-- Entry point — ES module, everything imports from here -->
   <script type="module" src="./src/core/app.js"></script>

@@ -1,0 +1,25 @@
+{
+  "type": "queue",
+  "label": "Queue — 3D Visualization",
+  "slots": [
+    { "id": "s0", "index": 0, "value": 5, "empty": false, "error": null },
+    { "id": "s1", "index": 1, "value": 10, "empty": false, "error": null },
+    { "id": "s2", "index": 2, "value": 15, "empty": false, "error": null },
+    { "id": "s3", "index": 3, "value": 20, "empty": false, "error": null },
+    { "id": "s4", "index": 4, "value": 25, "empty": false, "error": null }
+  ],
+  "length": 5,
+  "front": 0,
+  "rear": 4,
+  "operations": [
+    { "type": "enqueue", "slotId": "s0", "value": 5, "message": "Enqueue 5" },
+    { "type": "enqueue", "slotId": "s1", "value": 10, "message": "Enqueue 10" },
+    { "type": "enqueue", "slotId": "s2", "value": 15, "message": "Enqueue 15" },
+    { "type": "enqueue", "slotId": "s3", "value": 20, "message": "Enqueue 20" },
+    { "type": "enqueue", "slotId": "s4", "value": 25, "message": "Enqueue 25" },
+    { "type": "dequeue", "slotId": "s0", "message": "Dequeue 5" },
+    { "type": "dequeue", "slotId": "s1", "message": "Dequeue 10" },
+    { "type": "dequeue", "slotId": "s2", "message": "Dequeue 15" }
+  ],
+  "errors": []
+}

@@ -1,0 +1,16 @@
+{
+  "type": "doubly_list",
+  "label": "Doubly Linked List — 3D Visualization",
+  "nodes": [
+    { "id": "n1", "value": 12, "next": "n2", "prev": null, "error": null },
+    { "id": "n2", "value": 37, "next": "n3", "prev": "n1", "error": null },
+    { "id": "n3", "value": 59, "next": null, "prev": "n2", "error": null }
+  ],
+  "head": "n1",
+  "operations": [
+    { "type": "traverse", "from": "n1", "to": "n2", "message": "Forward to n2" },
+    { "type": "traverse", "from": "n2", "to": "n3", "message": "Forward to n3" },
+    { "type": "highlight", "nodeId": "n2", "message": "Backward from n3" }
+  ],
+  "errors": []
+}

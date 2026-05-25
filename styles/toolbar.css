@@ -1,34 +1,59 @@
 /* =============================================================
    SeeDS — toolbar.css
-   Top bar: brand, DS type tabs, demo buttons, camera reset.
+   Top bar: brand, DS type tabs (scrollable), demo buttons, camera reset.
    ============================================================= */
 
 .toolbar {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 16px;
+  padding: 0 12px;
   height: 100%;
-  background: rgba(15,15,19,0.85);
+  background: rgba(10,10,16,0.88);
   border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px) saturate(1.1);
+  -webkit-backdrop-filter: blur(16px) saturate(1.1);
 }
 
 
 /* Brand */
 .toolbar__brand {
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: var(--accent);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.10em;
+  background: linear-gradient(135deg, var(--accent), #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-right: 8px;
   flex-shrink: 0;
   text-transform: uppercase;
+  user-select: none;
 }
 
 
-/* DS type tabs */
+/* DS type tabs — scrollable overflow for 11+ tabs */
+.toolbar__tabs-wrap {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  max-width: 45vw;
+  overflow: hidden;
+  position: relative;
+}
+
+.toolbar__tabs-wrap::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 20px;
+  background: linear-gradient(to right, transparent, rgba(10,10,16,0.88));
+  pointer-events: none;
+  z-index: 1;
+}
+
 .toolbar__tabs {
   display: flex;
   gap: 2px;
@@ -36,17 +61,25 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 3px;
-  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.toolbar__tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .toolbar__tab {
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 12px;
+  padding: 4px 11px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-muted);
   white-space: nowrap;
+  flex-shrink: 0;
   transition: background var(--transition), color var(--transition);
+  letter-spacing: 0.01em;
 }
 
 .toolbar__tab:hover:not(.toolbar__tab--active) {
@@ -57,6 +90,7 @@
 .toolbar__tab--active {
   background: var(--accent);
   color: #fff;
+  box-shadow: 0 0 12px rgba(91,142,247,0.3);
 }
 
 
@@ -67,34 +101,53 @@
   flex: 1;
   overflow: hidden;
   margin-left: 4px;
+  min-width: 0;
+}
+
+.toolbar__demos-scroll {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 1px 0;
+}
+
+.toolbar__demos-scroll::-webkit-scrollbar {
+  display: none;
 }
 
 .toolbar__btn {
-  padding: 5px 11px;
+  padding: 4px 10px;
   border-radius: var(--radius);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--text-muted);
   background: var(--bg-raised);
   border: 1px solid var(--border);
   white-space: nowrap;
+  flex-shrink: 0;
   transition: all var(--transition);
 }
 
 .toolbar__btn:hover {
   background: var(--bg-hover);
-  border-color: var(--border-active);
+  border-color: var(--border-light);
   color: var(--text);
 }
 
 .toolbar__btn--demo.toolbar__btn--active {
-  background: rgba(79,142,247,0.15);
+  background: var(--accent-dim);
   border-color: var(--accent);
   color: var(--accent-hover);
+  box-shadow: 0 0 8px rgba(91,142,247,0.15);
 }
 
 .toolbar__btn--icon {
   font-size: 11px;
-  padding: 5px 10px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 
@@ -102,4 +155,23 @@
 .toolbar__right {
   margin-left: auto;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar__toggle-code {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  transition: all var(--transition);
+}
+
+.toolbar__toggle-code:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-light);
+  color: var(--text);
 }

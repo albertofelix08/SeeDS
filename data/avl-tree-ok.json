@@ -1,0 +1,34 @@
+{
+  "type": "avl_tree",
+  "label": "AVL Tree — 3D Visualization",
+  "nodes": [
+    { "id": "n1", "value": 40, "left": "n2", "right": "n3", "height": 3, "balanceFactor": 0, "error": null },
+    { "id": "n2", "value": 20, "left": "n4", "right": "n5", "height": 2, "balanceFactor": 1, "error": null },
+    { "id": "n3", "value": 60, "left": "n6", "right": "n7", "height": 2, "balanceFactor": -1, "error": null },
+    { "id": "n4", "value": 10, "left": null, "right": null, "height": 1, "balanceFactor": 0, "error": null },
+    { "id": "n5", "value": 25, "left": null, "right": null, "height": 1, "balanceFactor": 0, "error": null },
+    { "id": "n6", "value": 50, "left": null, "right": null, "height": 1, "balanceFactor": 0, "error": null },
+    { "id": "n7", "value": 70, "left": null, "right": null, "height": 1, "balanceFactor": 0, "error": null }
+  ],
+  "root": "n1",
+  "rotation": null,
+  "operations": [
+    { "type": "highlight", "nodeId": "n1", "message": "Root: 40" },
+    { "type": "traverse", "from": "n1", "to": "n2", "message": "Traverse left to 20" },
+    { "type": "highlight", "nodeId": "n2", "message": "Node: 20 (bf=+1)" },
+    { "type": "traverse", "from": "n2", "to": "n4", "message": "Traverse left to 10" },
+    { "type": "highlight", "nodeId": "n4", "message": "Node: 10" },
+    { "type": "traverse", "from": "n4", "to": "n2", "message": "Back to 20" },
+    { "type": "traverse", "from": "n2", "to": "n5", "message": "Traverse right to 25" },
+    { "type": "highlight", "nodeId": "n5", "message": "Node: 25" },
+    { "type": "traverse", "from": "n5", "to": "n1", "message": "Back to root" },
+    { "type": "traverse", "from": "n1", "to": "n3", "message": "Traverse right to 60" },
+    { "type": "highlight", "nodeId": "n3", "message": "Node: 60 (bf=-1)" },
+    { "type": "traverse", "from": "n3", "to": "n6", "message": "Traverse left to 50" },
+    { "type": "highlight", "nodeId": "n6", "message": "Node: 50" },
+    { "type": "traverse", "from": "n6", "to": "n3", "message": "Back to 60" },
+    { "type": "traverse", "from": "n3", "to": "n7", "message": "Traverse right to 70" },
+    { "type": "highlight", "nodeId": "n7", "message": "Node: 70" }
+  ],
+  "errors": []
+}

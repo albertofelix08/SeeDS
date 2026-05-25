@@ -1,0 +1,45 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "sort_race",
+  "label": "Insertion Sort",
+  "initialValues": [38, 27, 43, 3, 9, 82, 10],
+  "sorters": [
+    {
+      "id": "insertion",
+      "label": "Insertion Sort",
+      "complexity": "O(n²)",
+      "steps": [
+        { "type": "compare", "i": 1, "j": 0 },
+        { "type": "swap", "i": 1, "j": 0, "state": [27, 38, 43, 3, 9, 82, 10] },
+        { "type": "compare", "i": 2, "j": 1 },
+        { "type": "sorted", "i": 1, "state": [27, 38, 43, 3, 9, 82, 10] },
+        { "type": "compare", "i": 3, "j": 2 },
+        { "type": "swap", "i": 3, "j": 2, "state": [27, 38, 3, 43, 9, 82, 10] },
+        { "type": "compare", "i": 2, "j": 1 },
+        { "type": "swap", "i": 2, "j": 1, "state": [27, 3, 38, 43, 9, 82, 10] },
+        { "type": "compare", "i": 1, "j": 0 },
+        { "type": "swap", "i": 1, "j": 0, "state": [3, 27, 38, 43, 9, 82, 10] },
+        { "type": "sorted", "i": 3, "state": [3, 27, 38, 43, 9, 82, 10] },
+        { "type": "compare", "i": 4, "j": 3 },
+        { "type": "swap", "i": 4, "j": 3, "state": [3, 27, 38, 9, 43, 82, 10] },
+        { "type": "compare", "i": 3, "j": 2 },
+        { "type": "swap", "i": 3, "j": 2, "state": [3, 27, 9, 38, 43, 82, 10] },
+        { "type": "compare", "i": 2, "j": 1 },
+        { "type": "swap", "i": 2, "j": 1, "state": [3, 9, 27, 38, 43, 82, 10] },
+        { "type": "sorted", "i": 4, "state": [3, 9, 27, 38, 43, 82, 10] },
+        { "type": "compare", "i": 5, "j": 4 },
+        { "type": "sorted", "i": 5, "state": [3, 9, 27, 38, 43, 82, 10] },
+        { "type": "compare", "i": 6, "j": 5 },
+        { "type": "swap", "i": 6, "j": 5, "state": [3, 9, 27, 38, 43, 10, 82] },
+        { "type": "compare", "i": 5, "j": 4 },
+        { "type": "swap", "i": 5, "j": 4, "state": [3, 9, 27, 38, 10, 43, 82] },
+        { "type": "compare", "i": 4, "j": 3 },
+        { "type": "swap", "i": 4, "j": 3, "state": [3, 9, 27, 10, 38, 43, 82] },
+        { "type": "compare", "i": 3, "j": 2 },
+        { "type": "swap", "i": 3, "j": 2, "state": [3, 9, 10, 27, 38, 43, 82] },
+        { "type": "sorted", "i": 6, "state": [3, 9, 10, 27, 38, 43, 82] },
+        { "type": "done", "state": [3, 9, 10, 27, 38, 43, 82] }
+      ]
+    }
+  ]
+}

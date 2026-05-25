@@ -1,0 +1,24 @@
+{
+  "type": "stack",
+  "label": "Stack — 3D Visualization",
+  "slots": [
+    { "id": "s0", "index": 0, "value": 10, "empty": false, "error": null },
+    { "id": "s1", "index": 1, "value": 20, "empty": false, "error": null },
+    { "id": "s2", "index": 2, "value": 30, "empty": false, "error": null },
+    { "id": "s3", "index": 3, "value": 40, "empty": false, "error": null },
+    { "id": "s4", "index": 4, "value": 50, "empty": false, "error": null }
+  ],
+  "length": 5,
+  "top": 4,
+  "operations": [
+    { "type": "push", "slotId": "s0", "value": 10, "message": "Push 10" },
+    { "type": "push", "slotId": "s1", "value": 20, "message": "Push 20" },
+    { "type": "push", "slotId": "s2", "value": 30, "message": "Push 30" },
+    { "type": "push", "slotId": "s3", "value": 40, "message": "Push 40" },
+    { "type": "push", "slotId": "s4", "value": 50, "message": "Push 50" },
+    { "type": "pop", "slotId": "s4", "message": "Pop 50" },
+    { "type": "pop", "slotId": "s3", "message": "Pop 40" },
+    { "type": "pop", "slotId": "s2", "message": "Pop 30" }
+  ],
+  "errors": []
+}

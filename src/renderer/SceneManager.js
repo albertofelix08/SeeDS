@@ -125,12 +125,20 @@ class SceneManager {
   }
 
   _onResize() {
-    const w = window.innerWidth;
     const h = window.innerHeight;
+    const fullW = window.innerWidth;
+
+    // Account for code panel (40% width on the left when not minimized)
+    const codePanel = document.getElementById('code-panel');
+    const panelMinimized = codePanel?.classList.contains('code-panel--minimized');
+    const panelWidth = (!panelMinimized && codePanel) ? codePanel.offsetWidth : 0;
+
+    const w = fullW - panelWidth;
 
     this._camera.aspect = w / h;
     this._camera.updateProjectionMatrix();
-    this._renderer.setSize(w, h);
+    this._renderer.setSize(fullW, h);
+    this._renderer.setViewport(panelWidth, 0, w, h);
     this._renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   }
 

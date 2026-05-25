@@ -179,7 +179,7 @@ class PlaybackBar {
 
     // Update progress and counter from controller
     const ctrl = this._controller;
-    this._updateCounter(ctrl.stepIndex, ctrl.totalSteps);
+    this._updateCounter(ctrl.index, ctrl.total);
     this._updateProgress(ctrl.progress);
   }
 

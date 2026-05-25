@@ -1,0 +1,43 @@
+{
+  "type": "hash_table",
+  "label": "Hash Table — Separate Chaining",
+  "tableSize": 5,
+  "buckets": [
+    {
+      "index": 0,
+      "chain": [
+        { "id": "c0", "key": 10, "value": 42, "next": "c1" },
+        { "id": "c1", "key": 25, "value": 7, "next": null }
+      ]
+    },
+    {
+      "index": 1,
+      "chain": []
+    },
+    {
+      "index": 2,
+      "chain": [
+        { "id": "c2", "key": 12, "value": 99, "next": null }
+      ]
+    },
+    {
+      "index": 3,
+      "chain": []
+    },
+    {
+      "index": 4,
+      "chain": [
+        { "id": "c3", "key": 8, "value": 33, "next": "c4" },
+        { "id": "c4", "key": 18, "value": 55, "next": null }
+      ]
+    }
+  ],
+  "operations": [
+    { "type": "highlight", "nodeId": "c0", "message": "Hash key 10 → value 42" },
+    { "type": "highlight", "nodeId": "c1", "message": "Hash key 25 → value 7" },
+    { "type": "highlight", "nodeId": "c2", "message": "Hash key 12 → value 99" },
+    { "type": "highlight", "nodeId": "c3", "message": "Hash key 8 → value 33" },
+    { "type": "highlight", "nodeId": "c4", "message": "Hash key 18 → value 55" }
+  ],
+  "errors": []
+}

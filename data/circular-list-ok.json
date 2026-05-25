@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "type": "circular_list",
+  "label": "Circular Linked List",
+  "head": "n1",
+  "nodes": [
+    { "id": "n1", "value": 10, "next": "n2" },
+    { "id": "n2", "value": 20, "next": "n3" },
+    { "id": "n3", "value": 30, "next": "n4" },
+    { "id": "n4", "value": 40, "next": "n1" }
+  ],
+  "operations": [
+    { "type": "traverse", "from": "n1", "to": "n2" },
+    { "type": "traverse", "from": "n2", "to": "n3" },
+    { "type": "traverse", "from": "n3", "to": "n4" },
+    { "type": "highlight", "nodeId": "n1" }
+  ]
+}

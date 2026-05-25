@@ -1,0 +1,20 @@
+{
+  "type": "heap",
+  "label": "Min-Heap — 3D Visualization",
+  "values": [12, 20, 30, 40, 50, 35, 45],
+  "heapType": "min",
+  "heapSize": 7,
+  "operations": [
+    { "type": "highlight", "idx": 0, "nodeId": "h0", "message": "Root: 12" },
+    { "type": "highlight", "idx": 1, "nodeId": "h1", "message": "Left child: 20" },
+    { "type": "highlight", "idx": 2, "nodeId": "h2", "message": "Right child: 30" },
+    { "type": "highlight", "idx": 3, "nodeId": "h3", "message": "Value: 40" },
+    { "type": "highlight", "idx": 4, "nodeId": "h4", "message": "Value: 50" },
+    { "type": "highlight", "idx": 5, "nodeId": "h5", "message": "Value: 35" },
+    { "type": "highlight", "idx": 6, "nodeId": "h6", "message": "Value: 45" },
+    { "type": "sift_up", "idx": 6, "message": "Sift up index 6" },
+    { "type": "sift_up", "idx": 3, "message": "Sift up index 3" },
+    { "type": "sift_up", "idx": 1, "message": "Sift up index 1" }
+  ],
+  "errors": []
+}

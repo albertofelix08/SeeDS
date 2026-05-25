@@ -13,9 +13,31 @@ import * as THREE from '../../vendor/three/three.module.js';
 import { VISUAL }  from '../core/constants.js';
 
 
-// Canvas dimensions — power-of-two is friendliest for GPU
-const CANVAS_W = 256;
-const CANVAS_H = 64;
+// Canvas dimensions — bigger = higher quality text, still power-of-two for GPU
+const CANVAS_W = 512;
+const CANVAS_H = 128;
+
+
+/**
+ * Polyfill roundRect for older browsers (Chrome < 99, Firefox < 112).
+ */
+function roundRect(ctx, x, y, w, h, r) {
+  if (typeof CanvasRenderingContext2D.prototype.roundRect === 'function') {
+    ctx.roundRect(x, y, w, h, r);
+  } else {
+    r = Math.min(r, w / 2, h / 2);
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.arcTo(x + w, y, x + w, y + r, r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+    ctx.lineTo(x + r, y + h);
+    ctx.arcTo(x, y + h, x, y + h - r, r);
+    ctx.lineTo(x, y + r);
+    ctx.arcTo(x, y, x + r, y, r);
+    ctx.closePath();
+  }
+}
 
 
 class LabelSprite {
@@ -31,6 +53,40 @@ class LabelSprite {
 
 
   // -----------------------------------------------------------
+  //  Draw the canvas (used by _build and setText)
+  // -----------------------------------------------------------
+  _draw(ctx, text) {
+    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+
+    // Subtle semi-transparent glow behind text for readability without the heavy pill
+    // Strong text shadow for crisp readability
+    ctx.save();
+    ctx.shadowColor   = 'rgba(0,0,0,0.85)';
+    ctx.shadowBlur    = 8;
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 1;
+
+    const fontSize = VISUAL.LABEL_FONT_SIZE ?? 52;
+    ctx.font         = `bold ${fontSize}px "Inter", "Segoe UI", "Arial", sans-serif`;
+    ctx.textAlign    = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Draw subtle dark glow behind text (multiple layers for glow effect)
+    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    ctx.shadowBlur = 20;
+    ctx.fillText(text, CANVAS_W / 2, CANVAS_H / 2);
+    
+    // Main text - crisp white with shadow
+    ctx.shadowBlur = 6;
+    ctx.fillStyle  = '#ffffff';
+    ctx.fillText(text, CANVAS_W / 2, CANVAS_H / 2);
+    ctx.restore();
+
+    // Remove the pill/background
+  }
+
+
+  // -----------------------------------------------------------
   //  Build the canvas texture + sprite
   // -----------------------------------------------------------
   _build() {
@@ -39,24 +95,7 @@ class LabelSprite {
     canvas.height = CANVAS_H;
 
     const ctx = canvas.getContext('2d');
-
-    // Transparent background
-    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-
-    // Text style
-    const fontSize = VISUAL.LABEL_FONT_SIZE ?? 48;
-    ctx.font         = `bold ${fontSize}px "Inter", "Segoe UI", sans-serif`;
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-
-    // Subtle drop-shadow for legibility against the dark scene
-    ctx.shadowColor   = 'rgba(0,0,0,0.8)';
-    ctx.shadowBlur    = 6;
-    ctx.shadowOffsetX = 1;
-    ctx.shadowOffsetY = 1;
-
-    ctx.fillStyle = VISUAL.LABEL_COLOR ?? '#ffffff';
-    ctx.fillText(this._text, CANVAS_W / 2, CANVAS_H / 2);
+    this._draw(ctx, this._text);
 
     this._texture = new THREE.CanvasTexture(canvas);
     this._texture.needsUpdate = true;
@@ -64,15 +103,16 @@ class LabelSprite {
     const mat = new THREE.SpriteMaterial({
       map:             this._texture,
       transparent:     true,
-      depthWrite:      false,   // sprites behind geometry still readable
-      sizeAttenuation: true,    // scale with distance (perspective-correct)
+      depthWrite:      false,
+      sizeAttenuation: true,
+      depthTest:       true,
+      blending:        THREE.NormalBlending,
     });
 
     this._sprite = new THREE.Sprite(mat);
 
-    // Scale sprite to a reasonable world-unit size.
-    // Aspect ratio matches the canvas (256:64 = 4:1), height ~0.6 units.
-    this._sprite.scale.set(2.4, 0.6, 1);
+    // Scale sprite to appropriate world-unit size. 512:128 = 4:1 ratio
+    this._sprite.scale.set(3.0, 0.75, 1);
   }
 
 
@@ -95,17 +135,7 @@ class LabelSprite {
 
     const canvas = this._texture.image;
     const ctx    = canvas.getContext('2d');
-
-    ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-
-    const fontSize = VISUAL.LABEL_FONT_SIZE ?? 48;
-    ctx.font         = `bold ${fontSize}px "Inter", "Segoe UI", sans-serif`;
-    ctx.textAlign    = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.shadowColor  = 'rgba(0,0,0,0.8)';
-    ctx.shadowBlur   = 6;
-    ctx.fillStyle    = VISUAL.LABEL_COLOR ?? '#ffffff';
-    ctx.fillText(this._text, CANVAS_W / 2, CANVAS_H / 2);
+    this._draw(ctx, text);
 
     this._texture.needsUpdate = true;
   }

@@ -21,10 +21,18 @@ import LinkedList         from '../structures/LinkedList.js';
 import BinaryTree         from '../structures/BinaryTree.js';
 import ArrayStructure     from '../structures/Array.js';
 import SortRace           from '../structures/SortRace.js';
+import StackStructure     from '../structures/Stack.js';
+import QueueStructure     from '../structures/Queue.js';
+import GraphStructure     from '../structures/Graph.js';
+import HashTableStructure from '../structures/HashTable.js';
+import HeapStructure      from '../structures/Heap.js';
+import AVLTreeStructure   from '../structures/AVLTree.js';
 
 import Toolbar            from '../ui/Toolbar.js';
+import CodePanel          from '../ui/CodePanel.js';
 import PlaybackBar        from '../ui/PlaybackBar.js';
 import InfoTooltip        from '../ui/InfoTooltip.js';
+import StatusBar          from '../ui/StatusBar.js';
 import ErrorPanel         from '../ui/ErrorPanel.js';
 
 import * as THREE         from '../../vendor/three/three.module.js';
@@ -74,18 +82,25 @@ class App {
     this._toolbar    = new Toolbar(document.getElementById('toolbar'));
     this._playbar    = new PlaybackBar(document.getElementById('playback-bar'), this._controller);
     this._tooltip    = new InfoTooltip();
+    this._statusBar  = new StatusBar();
     this._errorPanel = new ErrorPanel(document.getElementById('error-panel'));
 
     // 5. Register per-frame tick
     this._loop.register('app', (delta, elapsed) => this._tick(delta, elapsed));
 
-    // 6. Bind all cross-module events
+    // 6. Wire the code analyzer panel
+    this._codePanel = new CodePanel();
+
+    // 7. Bind all cross-module events
     this._bindEvents();
 
-    // 7. Mouse events for raycasting
+    // 8. Mouse events for raycasting
     this._bindMouse();
 
-    // 8. Start the loop
+    // 9. Hide loading overlay
+    this._hideLoading();
+
+    // 10. Start the loop
     this._loop.start();
 
     console.log(`%c SeeDS v${APP.VERSION} — Phase ${APP.PHASE} `, 'background:#1a3a6e;color:#7db3ff;padding:4px 8px;border-radius:4px;');
@@ -109,6 +124,9 @@ class App {
 
     // Camera focus animation
     this._scene._tickFocus?.();
+
+    // Update FPS counter
+    this._statusBar?.tick();
   }
 
 
@@ -196,6 +214,35 @@ class App {
       case DS_TYPES.SORT_RACE:
         this._activeStructure = new SortRace(scene, camera);
         break;
+
+      // Stack & Queue — dedicated renderers
+      case DS_TYPES.STACK:
+        this._activeStructure = new StackStructure(scene, camera);
+        break;
+      case DS_TYPES.QUEUE:
+      case DS_TYPES.CIRCULAR_QUEUE:
+      case DS_TYPES.DEQUEUE:
+        this._activeStructure = new QueueStructure(scene, camera);
+        break;
+      case DS_TYPES.GRAPH:
+        this._activeStructure = new GraphStructure(scene, camera);
+        break;
+      case DS_TYPES.HASH_TABLE:
+        this._activeStructure = new HashTableStructure(scene, camera);
+        break;
+      case DS_TYPES.HEAP:
+        this._activeStructure = new HeapStructure(scene, camera);
+        break;
+      case DS_TYPES.AVL_TREE:
+        this._activeStructure = new AVLTreeStructure(scene, camera);
+        break;
+
+      // Doubly-linked & circular lists use extended LinkedList
+      case DS_TYPES.DOUBLY_LIST:
+      case DS_TYPES.CIRCULAR_LIST:
+        this._activeStructure = new LinkedList(scene, camera);
+        break;
+
       default:
         console.warn('[App] Unknown DS type:', type);
         return;
@@ -208,6 +255,25 @@ class App {
 
     // Reset camera to default so each DS starts with a clean view
     this._scene.resetCamera();
+
+    // Auto-play for SortRace and other structures that set _autoPlay
+    if (data._autoPlay && this._controller.total > 0) {
+      this._controller.play();
+    }
+  }
+
+
+  // -----------------------------------------------------------
+  //  Hide loading overlay
+  // -----------------------------------------------------------
+  _hideLoading() {
+    const overlay = document.getElementById('app-loading');
+    if (overlay) {
+      setTimeout(() => {
+        overlay.classList.add('app-loading--hidden');
+        setTimeout(() => overlay.remove(), 400);
+      }, 200);
+    }
   }
 
 

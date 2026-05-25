@@ -1,11 +1,11 @@
 // =============================================================
 //  SeeDS — Toolbar.js
 //  Top bar UI. Handles:
-//    - Data structure type selector
-//    - Demo scenario buttons (ok, cycle, dangling, leak, etc.)
+//    - Data structure type selector (scrollable for 11+ tabs)
+//    - Demo scenario buttons (scrollable)
+//    - Toggle code panel button
 //    - Camera reset button
-//  Communicates exclusively via eventBus — no direct imports
-//  of renderer or structure files.
+//  Communicates exclusively via eventBus.
 // =============================================================
 
 import eventBus from '../core/eventBus.js';
@@ -20,22 +20,56 @@ const DEMOS = {
     { label: '⚠ Dangling',        file: 'linked-list-dangling.json' },
     { label: '⛁ Memory Leak',    file: 'linked-list-leak.json'     },
   ],
+  [DS_TYPES.CIRCULAR_LIST]: [
+    { label: '↻ Circular List',  file: 'circular-list-ok.json'     },
+  ],
+  [DS_TYPES.DOUBLY_LIST]: [
+    { label: '✓ Doubly Linked',   file: 'doubly-list-ok.json'      },
+  ],
+  [DS_TYPES.STACK]: [
+    { label: '✓ Stack ADT',       file: 'stack-ok.json'            },
+  ],
+  [DS_TYPES.QUEUE]: [
+    { label: '✓ Queue ADT',       file: 'queue-ok.json'            },
+  ],
   [DS_TYPES.BINARY_TREE]: [
     { label: '✓ BST Search',      file: 'binary-tree-ok.json'       },
   ],
+  [DS_TYPES.AVL_TREE]: [
+    { label: '✓ AVL Tree',        file: 'avl-tree-ok.json'          },
+  ],
+  [DS_TYPES.HEAP]: [
+    { label: '✓ Binary Heap',     file: 'heap-ok.json'             },
+  ],
+  [DS_TYPES.GRAPH]: [
+    { label: '✓ Graph + BFS',     file: 'graph-ok.json'            },
+  ],
+  [DS_TYPES.HASH_TABLE]: [
+    { label: '✓ Hash Table',      file: 'hash-table-ok.json'       },
+  ],
   [DS_TYPES.ARRAY]: [
     { label: '✓ Linear Search',   file: 'array-search.json'         },
+    { label: '✓ Binary Search',   file: 'binary-search.json'        },
   ],
   [DS_TYPES.SORT_RACE]: [
-    { label: '▶ Start Race',      file: 'sort-race.json'            },
+    { label: '▶ Bubble/Merge/Quick', file: 'sort-race.json'          },
+    { label: '▶ Insertion Sort',     file: 'insertion-sort.json'     },
   ],
 };
 
 const DS_LABELS = {
-  [DS_TYPES.LINKED_LIST]: 'Linked List',
-  [DS_TYPES.BINARY_TREE]: 'Binary Tree',
-  [DS_TYPES.ARRAY]:       'Array',
-  [DS_TYPES.SORT_RACE]:   'Sort Race',
+  [DS_TYPES.LINKED_LIST]:  'Linked List',
+  [DS_TYPES.CIRCULAR_LIST]:'Circular List',
+  [DS_TYPES.DOUBLY_LIST]:  'Doubly List',
+  [DS_TYPES.STACK]:        'Stack',
+  [DS_TYPES.QUEUE]:        'Queue',
+  [DS_TYPES.BINARY_TREE]:  'Binary Tree',
+  [DS_TYPES.AVL_TREE]:     'AVL Tree',
+  [DS_TYPES.HEAP]:         'Heap',
+  [DS_TYPES.GRAPH]:        'Graph',
+  [DS_TYPES.HASH_TABLE]:   'Hash Table',
+  [DS_TYPES.ARRAY]:        'Array',
+  [DS_TYPES.SORT_RACE]:    'Sort Race',
 };
 
 
@@ -60,13 +94,16 @@ class Toolbar {
     this._container.innerHTML = '';
     this._container.className = 'toolbar';
 
-    // Left group — branding
+    // Brand
     const brand = document.createElement('div');
     brand.className   = 'toolbar__brand';
     brand.textContent = 'SeeDS';
     this._container.appendChild(brand);
 
-    // Center group — DS type tabs
+    // Scrollable DS tabs
+    const tabsWrap = document.createElement('div');
+    tabsWrap.className = 'toolbar__tabs-wrap';
+
     const tabs = document.createElement('div');
     tabs.className = 'toolbar__tabs';
 
@@ -82,16 +119,31 @@ class Toolbar {
       this._dsButtons.set(type, btn);
     }
 
-    this._container.appendChild(tabs);
+    tabsWrap.appendChild(tabs);
+    this._container.appendChild(tabsWrap);
 
     // Demo buttons group
     this._demoGroup = document.createElement('div');
     this._demoGroup.className = 'toolbar__demos';
     this._container.appendChild(this._demoGroup);
 
-    // Right group — camera reset
+    // Right group — camera reset + code toggle
     const right = document.createElement('div');
     right.className = 'toolbar__right';
+
+    // Toggle code panel button
+    const toggleCodeBtn = document.createElement('button');
+    toggleCodeBtn.className   = 'toolbar__toggle-code';
+    toggleCodeBtn.textContent = '◂ Code';
+    toggleCodeBtn.title       = 'Toggle code panel';
+    toggleCodeBtn.addEventListener('click', () => {
+      const panel = document.getElementById('code-panel');
+      if (!panel) return;
+      const isMinimized = panel.classList.toggle('code-panel--minimized');
+      toggleCodeBtn.textContent = isMinimized ? '▸ Code' : '◂ Code';
+      window.dispatchEvent(new Event('resize'));
+    });
+    right.appendChild(toggleCodeBtn);
 
     const resetBtn = document.createElement('button');
     resetBtn.className   = 'toolbar__btn toolbar__btn--icon';
@@ -99,7 +151,6 @@ class Toolbar {
     resetBtn.title       = 'Reset camera to default position';
     resetBtn.addEventListener('click', () => {
       eventBus.emit(EVENTS.PLAYBACK_RESET);
-      // We emit a custom camera reset via a dedicated event
       eventBus.emit('camera:reset');
     });
     right.appendChild(resetBtn);

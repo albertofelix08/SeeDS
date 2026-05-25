@@ -307,17 +307,17 @@ class LinkedList {
 
     // Value label on the ghost
     const label = LabelSprite.create(String(node.value), this._scene);
-    label.setPosition(baseX, baseY + 1.1, baseZ);
+    label.setPosition(baseX, baseY + 1.4, baseZ);
     this._labels.set(node.id, label);
 
     // Address label below
     const addrLabel = LabelSprite.create(node.address ?? '???', this._scene);
-    addrLabel.setPosition(baseX, baseY - 1.2, baseZ);
+    addrLabel.setPosition(baseX, baseY - 1.3, baseZ);
     this._labels.set(node.id + '_addr', addrLabel);
 
     // "LEAKED" badge
     const badge = LabelSprite.create('LEAKED', this._scene);
-    badge.setPosition(baseX, baseY - 1.8, baseZ);
+    badge.setPosition(baseX, baseY - 2.0, baseZ);
     this._labels.set(node.id + '_badge', badge);
 
     // Store for animation

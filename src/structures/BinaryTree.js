@@ -46,7 +46,7 @@ class BinaryTree {
       this._nodes.set(id, mesh);
 
       const label = LabelSprite.create(String(node.value), this._scene);
-      label.setPosition(pos.x, pos.y + 1.1, 0);
+      label.setPosition(pos.x, pos.y + 1.4, 0);
       this._labels.set(id, label);
     }
 

@@ -1,6 +1,6 @@
 /* =============================================================
    SeeDS — main.css
-   Base styles: reset, layout, dark theme, canvas, tooltip.
+   Base styles: reset, layout shell, dark theme, canvas, tooltip.
    ============================================================= */
 
 /* --- Reset & Base ------------------------------------------ */
@@ -47,7 +47,7 @@
   /* Layout */
   --toolbar-h:     52px;
   --playbar-h:     56px;
-  --panel-w:       260px;
+  --editor-w:      420px;   /* permanent left panel width */
 
   /* Radii */
   --radius:        6px;
@@ -66,7 +66,7 @@
   --font-mono:    'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', monospace;
 
   /* Transitions */
-  --transition:    180ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition:      180ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -83,26 +83,20 @@ html, body {
 }
 
 
-/* --- Canvas ------------------------------------------------- */
-#seeds-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  z-index: 0;
-  transition: opacity 0.4s ease;
-}
+/* =============================================================
+   APP LAYOUT SHELL
+   toolbar (top, full width)
+   app-shell (middle, two columns)
+   playback-bar (bottom, full width)
+   ============================================================= */
 
-
-/* --- Layout shells ----------------------------------------- */
 #toolbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: var(--toolbar-h);
-  z-index: 10;
+  z-index: 20;
 }
 
 #playback-bar {
@@ -111,32 +105,76 @@ html, body {
   left: 0;
   right: 0;
   height: var(--playbar-h);
-  z-index: 10;
+  z-index: 20;
 }
 
-#error-panel {
-  position: fixed;
-  top: calc(var(--toolbar-h) + 12px);
-  right: 12px;
-  width: var(--panel-w);
-  max-height: calc(100vh - var(--toolbar-h) - var(--playbar-h) - 24px);
-  z-index: 10;
-  transition: opacity var(--transition), transform var(--transition);
-}
-
-/* --- Status Bar ------------------------------------------- */
-#status-bar {
+/* Two-column shell sits between toolbar and playbar */
+#app-shell {
   position: fixed;
   top: var(--toolbar-h);
-  left: 40%;
+  left: 0;
+  right: 0;
+  bottom: var(--playbar-h);
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
+}
+
+
+/* --- Left column: permanent code editor -------------------- */
+#code-panel {
+  width: var(--editor-w);
+  min-width: var(--editor-w);
+  max-width: var(--editor-w);
+  height: 100%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: rgba(10, 10, 16, 0.98);
+  border-right: 1px solid var(--border);
+  z-index: 10;
+  overflow: hidden;
+}
+
+
+/* --- Right column: canvas area ----------------------------- */
+#canvas-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+
+#seeds-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+
+/* --- Status bar (inside canvas-area) ----------------------- */
+#status-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
   right: 0;
   height: 28px;
   z-index: 9;
   pointer-events: none;
 }
 
-body:has(#code-panel.code-panel--minimized) #status-bar {
-  left: 0;
+
+/* --- Error panel (floating over canvas) -------------------- */
+#error-panel {
+  position: absolute;
+  top: 40px;
+  right: 12px;
+  width: 260px;
+  max-height: calc(100% - 52px);
+  z-index: 10;
+  transition: opacity var(--transition), transform var(--transition);
 }
 
 

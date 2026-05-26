@@ -110,6 +110,9 @@ class App {
     step = 'loop.start()';
     this._loop.start();
 
+    // Fire initial resize so canvas fills the right column correctly
+    window.dispatchEvent(new Event('resize'));
+
     console.log(`%c SeeDS v${APP.VERSION} booted OK `, 'background:#1a3a6e;color:#7db3ff;padding:4px 8px;border-radius:4px;');
   }
 

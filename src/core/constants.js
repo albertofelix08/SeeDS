@@ -24,12 +24,6 @@ export const DS_TYPES = {
   HASH_TABLE:   'hash_table',
   AVL_TREE:     'avl_tree',
   HEAP:         'heap',
-
-  // Extended types
-  DOUBLY_LIST:  'doubly_list',
-  CIRCULAR_LIST:'circular_list',
-  CIRCULAR_QUEUE:'circular_queue',
-  DEQUEUE:      'dequeue',
 };
 
 
@@ -139,48 +133,13 @@ export const VISUAL = {
   CYCLE_LOOP_THRESHOLD:   10,         // loops before we flag and pause
 
   // Sorting race bars
-  BAR_WIDTH:              0.4,
-  BAR_GAP:                0.15,
+  BAR_WIDTH:              0.9,
+  BAR_GAP:                0.2,
   BAR_COLOR_DEFAULT:      0x4f8ef7,
   BAR_COLOR_COMPARING:    0xffc44d,   // amber — currently being compared
   BAR_COLOR_SORTED:       0x4fc97e,   // green — in final position
   BAR_COLOR_PIVOT:        0xff6b6b,   // red — quicksort pivot
-
-  // Stack visual
-  STACK_BOX_SIZE:          0.9,       // width/depth of each stack box
-  STACK_BOX_HEIGHT:        0.5,       // height of each stack box
-  STACK_OFFSET_Y:          0.55,      // vertical gap between stacked boxes
-  STACK_MAX_ITEMS:         8,
-
-  // Queue visual
-  QUEUE_SLOT_SIZE:         0.8,       // width/depth of each queue slot
-  QUEUE_SLOT_HEIGHT:        0.6,
-  QUEUE_GAP:                0.1,
-  QUEUE_PTR_COLOR:          0xffc44d, // amber for front/rear pointers
-
-  // Graph visual
-  GRAPH_VERTEX_RADIUS:      0.5,
-  GRAPH_EDGE_LINE_WIDTH:    0.03,
-  GRAPH_VERTEX_COLOR:       0x7c5cfc, // purple
-  GRAPH_VISITED_COLOR:      0x4fc97e, // green
-  GRAPH_EDGE_DEFAULT:       0x5a5a7a,
-  GRAPH_VERTEX_EMISSIVE:    0x2a1a5a,
-
-  // Hash table visual
-  HT_BUCKET_WIDTH:          1.0,
-  HT_BUCKET_HEIGHT:         0.5,
-  HT_BUCKET_GAP:            0.15,
-  HT_BUCKET_COLOR:          0x6a4f8e, // purple-gray
-  HT_EMPTY_COLOR:           0x2a2a3a,
-
-  // Heap visual
-  HEAP_NODE_RADIUS:         0.5,
-  HEAP_MIN_COLOR:           0x4fc97e, // green for min-heap
-  HEAP_MAX_COLOR:           0xff6b6b, // red for max-heap
 };
-
-
-// Layout config additions are in LAYOUT below
 
 
 // -------------------------------------------------------------
@@ -204,13 +163,13 @@ export const CAMERA = {
 // -------------------------------------------------------------
 export const LAYOUT = {
   // Linked list
-  LL_NODE_SPACING:      3.2,    // horizontal gap between nodes
+  LL_NODE_SPACING:      2.8,    // horizontal gap between nodes
   LL_Y:                 0,      // y position of the list plane
-  LL_DANGLING_Y:        4.0,    // how high a dangling node floats
+  LL_DANGLING_Y:        3.5,    // how high a dangling node floats
 
   // Binary tree
-  TREE_LEVEL_HEIGHT:    3.2,    // vertical gap between levels
-  TREE_H_SPREAD:        1.8,    // horizontal spread multiplier per level
+  TREE_LEVEL_HEIGHT:    2.8,    // vertical gap between levels
+  TREE_H_SPREAD:        1.6,    // horizontal spread multiplier per level
 
   // Array
   ARRAY_SLOT_WIDTH:     1.2,
@@ -219,28 +178,8 @@ export const LAYOUT = {
   ARRAY_GAP:            0.15,
 
   // Sort race
-  SORT_RACE_SPACING:    14,     // horizontal distance between each sorter
-  SORT_BAR_MAX_HEIGHT:  5,      // tallest bar height in units
-
-  // Stack layout
-  STACK_CENTER_X:       0,
-  STACK_BASE_Y:         -2.0,
-
-  // Queue layout
-  QUEUE_CENTER_X:       0,
-  QUEUE_Y:              0.5,
-
-  // Graph layout
-  GRAPH_RADIUS:         5.0,    // radius of the circle when arranging vertices
-
-  // Hash table layout
-  HT_START_X:           -4.0,
-  HT_START_Y:           3.0,
-  HT_ROW_STEP_Y:        -1.5,   // vertical gap between bucket rows
-
-  // Heap layout — increased spacing to prevent label overlap
-  HEAP_LEVEL_HEIGHT:    3.0,
-  HEAP_H_SPREAD:        2.0,
+  SORT_RACE_SPACING:    14,      // horizontal distance between each sorter
+  SORT_BAR_MAX_HEIGHT:  6,      // tallest bar height in units
 };
 
 

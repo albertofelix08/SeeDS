@@ -197,6 +197,14 @@ class SceneManager {
     this._focusing = false;
   }
 
+  // Set camera to a specific position (used by DS types needing a custom view)
+  setCameraPosition(x, y, z) {
+    this._camera.position.set(x, y, z);
+    this._controls.target.set(0, 0, 0);
+    this._controls.update();
+    this._focusing = false;
+  }
+
   // Clear all non-light objects from the scene
   // Called when loading a new data structure
   clearScene() {

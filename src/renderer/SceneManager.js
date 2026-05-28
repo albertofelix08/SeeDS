@@ -50,7 +50,7 @@ class SceneManager {
     // setSize(..., false) means "don't touch CSS styles"
     this._renderer.setSize(window.innerWidth, window.innerHeight, false);
     this._renderer.shadowMap.enabled = true;
-    this._renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+    this._renderer.shadowMap.type    = THREE.PCFShadowMap;
     // Correct color rendering for modern Three.js
     this._renderer.outputColorSpace   = THREE.SRGBColorSpace;
     this._renderer.toneMapping        = THREE.ACESFilmicToneMapping;
@@ -224,6 +224,19 @@ class SceneManager {
       this._scene.remove(obj);
     }
   }
+
+  /**
+   * Set scene background + fog color (used by theme switching).
+   */
+  setBackground(bgColor, fogColor) {
+    if (this._scene) {
+      this._scene.background = new THREE.Color(bgColor);
+      if (this._scene.fog) {
+        this._scene.fog.color.setHex(fogColor);
+      }
+    }
+  }
+
 
   // Getters — other modules use these, never instantiate their own
   getScene()    { return this._scene;    }

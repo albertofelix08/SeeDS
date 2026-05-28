@@ -160,18 +160,3 @@
   gap: 6px;
 }
 
-.toolbar__toggle-code {
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: var(--radius);
-  color: var(--text-muted);
-  background: var(--bg-raised);
-  border: 1px solid var(--border);
-  transition: all var(--transition);
-}
-
-.toolbar__toggle-code:hover {
-  background: var(--bg-hover);
-  border-color: var(--border-light);
-  color: var(--text);
-}

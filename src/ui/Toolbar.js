@@ -9,7 +9,7 @@
 // =============================================================
 
 import eventBus from '../core/eventBus.js';
-import { EVENTS, DS_TYPES, APP } from '../core/constants.js';
+import { EVENTS, DS_TYPES, APP, THEME } from '../core/constants.js';
 
 
 // Maps each DS type to its available demo files
@@ -127,27 +127,39 @@ class Toolbar {
     this._demoGroup.className = 'toolbar__demos';
     this._container.appendChild(this._demoGroup);
 
-    // Right group — camera reset + code toggle
+    // Right group — theme, code toggle, camera reset
     const right = document.createElement('div');
     right.className = 'toolbar__right';
 
-    // Toggle code panel button
-    const toggleCodeBtn = document.createElement('button');
-    toggleCodeBtn.className   = 'toolbar__toggle-code';
-    toggleCodeBtn.textContent = '◂ Code';
-    toggleCodeBtn.title       = 'Toggle code panel';
-    toggleCodeBtn.addEventListener('click', () => {
-      const panel = document.getElementById('code-panel');
-      if (!panel) return;
-      const isMinimized = panel.classList.toggle('code-panel--minimized');
-      toggleCodeBtn.textContent = isMinimized ? '▸ Code' : '◂ Code';
-      window.dispatchEvent(new Event('resize'));
+    // Theme toggle button
+    const themeBtn = document.createElement('button');
+    themeBtn.className   = 'toolbar__btn toolbar__btn--icon';
+    themeBtn.textContent = '☾';
+    themeBtn.title       = 'Toggle theme (light/dark)';
+    themeBtn.id          = 'toolbar-theme-btn';
+    themeBtn.addEventListener('click', () => {
+      const isLight = document.body.classList.contains('light-theme');
+      eventBus.emit('theme:set', { theme: isLight ? THEME.DARK : THEME.LIGHT });
     });
-    right.appendChild(toggleCodeBtn);
+    right.appendChild(themeBtn);
+
+    // Fullscreen button
+    const fullscreenBtn = document.createElement('button');
+    fullscreenBtn.className   = 'toolbar__btn toolbar__btn--icon';
+    fullscreenBtn.textContent = '⛶ Fullscreen';
+    fullscreenBtn.title       = 'Toggle fullscreen view';
+    fullscreenBtn.addEventListener('click', () => {
+      eventBus.emit('fullscreen:set', { enabled: !document.body.classList.contains('fullscreen-mode') });
+    });
+    // Keep icon in sync
+    eventBus.on('fullscreen:set', ({ enabled }) => {
+      fullscreenBtn.textContent = enabled ? '✕ Exit' : '⛶ Fullscreen';
+    });
+    right.appendChild(fullscreenBtn);
 
     const resetBtn = document.createElement('button');
     resetBtn.className   = 'toolbar__btn toolbar__btn--icon';
-    resetBtn.textContent = '⌖ Reset Camera';
+    resetBtn.textContent = '⌖ Reset';
     resetBtn.title       = 'Reset camera to default position';
     resetBtn.addEventListener('click', () => {
       eventBus.emit(EVENTS.PLAYBACK_RESET);
@@ -155,6 +167,11 @@ class Toolbar {
     });
     right.appendChild(resetBtn);
     this._container.appendChild(right);
+
+    // Listen for theme changes so button icon stays in sync
+    eventBus.on('theme:set', ({ theme }) => {
+      themeBtn.textContent = theme === THEME.LIGHT ? '☀' : '☾';
+    });
 
     // Build initial demo buttons
     this._buildDemoButtons(this._activeDS);

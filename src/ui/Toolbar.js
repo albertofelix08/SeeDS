@@ -216,7 +216,7 @@ class Toolbar {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
 
-      eventBus.emit(EVENTS.DS_LOADED, { type: dsType, data });
+      eventBus.emit(EVENTS.DS_LOADED, { type: dsType, data, source: 'toolbar' });
     } catch (err) {
       console.error(`[Toolbar] Failed to load demo "${file}":`, err);
     }

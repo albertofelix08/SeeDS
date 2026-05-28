@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -11,36 +11,75 @@
   <link rel="stylesheet" href="./styles/toolbar.css" />
   <link rel="stylesheet" href="./styles/panels.css" />
   <link rel="stylesheet" href="./styles/code-panel.css" />
+  <link rel="stylesheet" href="./styles/editor.css" />
 </head>
 
 <body>
 
-  <!-- TOP BAR -->
+  <!-- TOP BAR — spans full width -->
   <div id="toolbar"></div>
 
-  <!-- CODE PANEL — left side, 40% width, code analyzer -->
-  <div id="code-panel"></div>
+<<<<<<< HEAD
+  <!-- APP SHELL — two columns below toolbar, above playback -->
+  <div id="app-shell">
 
-  <!-- MAIN CANVAS — Three.js renders here -->
-  <canvas id="seeds-canvas"></canvas>
+    <!-- LEFT: Permanent code editor panel -->
+    <div id="code-panel"></div>
 
-  <!-- ERROR PANEL — right side, collapsible -->
-  <div id="error-panel"></div>
+    <!-- RIGHT: 3D canvas + overlays -->
+    <div id="canvas-area">
+      <canvas id="seeds-canvas"></canvas>
+      <div id="status-bar"></div>
+      <div id="error-panel"></div>
+    </div>
 
-  <!-- STATUS BAR — below toolbar, above canvas -->
+  </div>
+
+  <!-- BOTTOM PLAYBACK BAR — spans full width -->
+=======
+  <!-- STATUS BAR — below toolbar, above editor + canvas -->
   <div id="status-bar"></div>
 
+  <!-- MAIN APP LAYOUT: editor left, canvas right -->
+  <div id="app-layout">
+    <!-- CODE PANEL — left side, Monaco editor + analyzer -->
+    <div id="code-panel"></div>
+
+    <!-- DIVIDER — draggable resize handle -->
+    <div id="panel-divider"></div>
+
+    <!-- VISUALIZER — canvas + overlays -->
+    <div id="visualizer-area">
+      <!-- MAIN CANVAS — Three.js renders here -->
+      <canvas id="seeds-canvas"></canvas>
+
+      <!-- ERROR BADGE — compact floating button (replaces large panel) -->
+      <div id="error-badge"></div>
+    </div>
+  </div>
+
+  <!-- FLOATING ERROR PANEL — slides in from right when clicked -->
+  <div id="floating-error-panel"></div>
+
   <!-- BOTTOM PLAYBACK BAR -->
+>>>>>>> 664097d (updated files)
   <div id="playback-bar"></div>
 
-  <!-- LOADING OVERLAY — visible while app initializes -->
+  <!-- LOADING OVERLAY -->
   <div id="app-loading" class="app-loading">
     <div class="app-loading__spinner"></div>
     <div class="app-loading__text">Loading SeeDS…</div>
   </div>
 
-  <!-- Entry point — ES module, everything imports from here -->
+  <!-- Ace Editor — single script tag, no AMD, no workers needed -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.3/ace.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.3/mode-c_cpp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.3/theme-tomorrow_night.min.js"></script>
+
+  <!-- Entry point -->
   <script type="module" src="./src/core/app.js"></script>
+  <!-- Entry point — ES module, everything imports from here -->
+  <script type="module" src="./src/core/app.js?v=2"></script>
 
 </body>
 </html>

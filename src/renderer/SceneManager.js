@@ -34,6 +34,8 @@ class SceneManager {
     this._buildLights();
     this._buildControls();
     this._bindResize();
+    // Run resize immediately so the viewport accounts for the code panel
+    this._onResize();
   }
 
   _buildRenderer() {
@@ -44,7 +46,9 @@ class SceneManager {
     });
 
     this._renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    this._renderer.setSize(window.innerWidth, window.innerHeight);
+    // Don't set CSS size here — CSS handles that via width:100%;height:100%
+    // setSize(..., false) means "don't touch CSS styles"
+    this._renderer.setSize(window.innerWidth, window.innerHeight, false);
     this._renderer.shadowMap.enabled = true;
     this._renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
     // Correct color rendering for modern Three.js

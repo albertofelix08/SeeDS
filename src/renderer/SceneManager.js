@@ -46,9 +46,9 @@ class SceneManager {
     });
 
     this._renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    // Don't set CSS size here — CSS handles that via width:100%;height:100%
-    // setSize(..., false) means "don't touch CSS styles"
-    this._renderer.setSize(window.innerWidth, window.innerHeight, false);
+    // Canvas only occupies the right column — measure it properly
+    const { w: initW, h: initH } = this._getCanvasSize();
+    this._renderer.setSize(initW, initH);
     this._renderer.shadowMap.enabled = true;
     this._renderer.shadowMap.type    = THREE.PCFShadowMap;
     // Correct color rendering for modern Three.js
@@ -68,7 +68,8 @@ class SceneManager {
   }
 
   _buildCamera() {
-    const aspect = window.innerWidth / window.innerHeight;
+    const { w, h } = this._getCanvasSize();
+    const aspect = w / h;
     this._camera = new THREE.PerspectiveCamera(
       CAMERA.FOV,
       aspect,
@@ -128,24 +129,24 @@ class SceneManager {
     window.addEventListener('resize', () => this._onResize());
   }
 
-  _onResize() {
-    const h = window.innerHeight;
-    const fullW = window.innerWidth;
-
-    // Account for code panel (40% width on the left when not minimized)
-    const codePanel = document.getElementById('code-panel');
-    const panelMinimized = codePanel?.classList.contains('code-panel--minimized');
-    const panelWidth = (!panelMinimized && codePanel) ? codePanel.offsetWidth : 0;
-
-    const w = fullW - panelWidth;
-
-    this._camera.aspect = w / h;
-    this._camera.updateProjectionMatrix();
-    this._renderer.setSize(fullW, h);
-    this._renderer.setViewport(panelWidth, 0, w, h);
-    this._renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // Returns usable canvas dimensions (right column only)
+  _getCanvasSize() {
+    const canvasArea = document.getElementById('canvas-area');
+    if (canvasArea) {
+      return { w: canvasArea.clientWidth, h: canvasArea.clientHeight };
+    }
+    const editorPanel = document.getElementById('code-panel');
+    const editorW = editorPanel ? editorPanel.offsetWidth : 0;
+    return { w: window.innerWidth - editorW, h: window.innerHeight };
   }
 
+  _onResize() {
+    const { w, h } = this._getCanvasSize();
+    this._camera.aspect = w / h;
+    this._camera.updateProjectionMatrix();
+    this._renderer.setSize(w, h);
+    this._renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  }
 
   // -----------------------------------------------------------
   //  PUBLIC API
@@ -196,6 +197,14 @@ class SceneManager {
       CAMERA.DEFAULT_POS.y,
       CAMERA.DEFAULT_POS.z
     );
+    this._controls.target.set(0, 0, 0);
+    this._controls.update();
+    this._focusing = false;
+  }
+
+  // Set camera to a specific position (used by DS types needing a custom view)
+  setCameraPosition(x, y, z) {
+    this._camera.position.set(x, y, z);
     this._controls.target.set(0, 0, 0);
     this._controls.update();
     this._focusing = false;

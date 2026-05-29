@@ -19,31 +19,22 @@
   <!-- TOP BAR — spans full width -->
   <div id="toolbar"></div>
 
-  <!-- STATUS BAR — below toolbar, above editor + canvas -->
-  <div id="status-bar"></div>
+  <!-- APP SHELL — two columns below toolbar, above playback -->
+  <div id="app-shell">
 
-  <!-- MAIN APP LAYOUT: editor left, canvas right -->
-  <div id="app-layout">
-    <!-- CODE PANEL — left side, Monaco editor + analyzer -->
+    <!-- LEFT: Permanent code editor panel -->
     <div id="code-panel"></div>
 
-    <!-- DIVIDER — draggable resize handle -->
-    <div id="panel-divider"></div>
-
-    <!-- VISUALIZER — canvas + overlays -->
-    <div id="visualizer-area">
-      <!-- MAIN CANVAS — Three.js renders here -->
+    <!-- RIGHT: 3D canvas + overlays -->
+    <div id="canvas-area">
       <canvas id="seeds-canvas"></canvas>
-
-      <!-- ERROR BADGE — compact floating button (replaces large panel) -->
-      <div id="error-badge"></div>
+      <div id="status-bar"></div>
+      <div id="error-panel"></div>
     </div>
+
   </div>
 
-  <!-- FLOATING ERROR PANEL — slides in from right when clicked -->
-  <div id="floating-error-panel"></div>
-
-  <!-- BOTTOM PLAYBACK BAR -->
+  <!-- BOTTOM PLAYBACK BAR — spans full width -->
   <div id="playback-bar"></div>
 
   <!-- LOADING OVERLAY -->
@@ -51,6 +42,11 @@
     <div class="app-loading__spinner"></div>
     <div class="app-loading__text">Loading SeeDS…</div>
   </div>
+
+  <!-- Ace Editor — single script tag, no AMD, no workers needed -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.3/ace.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.3/mode-c_cpp.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.43.3/theme-tomorrow_night.min.js"></script>
 
   <!-- Entry point -->
   <script type="module" src="./src/core/app.js"></script>

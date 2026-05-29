@@ -12,24 +12,26 @@
 //  Used by: Toolbar, analyzer, structure renderers
 // -------------------------------------------------------------
 export const DS_TYPES = {
-  LINKED_LIST:  'linked_list',
-  BINARY_TREE:  'binary_tree',
-  ARRAY:        'array',
-  SORT_RACE:    'sort_race',
+  LINKED_LIST:    'linked_list',
+  BINARY_TREE:    'binary_tree',
+  ARRAY:          'array',
+  SORT_RACE:      'sort_race',
 
   // Phase 3 — stubs, not used in P1
-  STACK:        'stack',
-  QUEUE:        'queue',
-  GRAPH:        'graph',
-  HASH_TABLE:   'hash_table',
-  AVL_TREE:     'avl_tree',
-  HEAP:         'heap',
+  STACK:          'stack',
+  QUEUE:          'queue',
+  GRAPH:          'graph',
+  HASH_TABLE:     'hash_table',
+  AVL_TREE:       'avl_tree',
+  HEAP:           'heap',
 
-  // Extended types
-  DOUBLY_LIST:  'doubly_list',
-  CIRCULAR_LIST:'circular_list',
-  CIRCULAR_QUEUE:'circular_queue',
-  DEQUEUE:      'dequeue',
+  // Linked list variants
+  DOUBLY_LIST:    'doubly_list',
+  CIRCULAR_LIST:  'circular_list',
+
+  // Queue variants
+  CIRCULAR_QUEUE: 'circular_queue',
+  DEQUEUE:        'dequeue',
 };
 
 
@@ -138,49 +140,42 @@ export const VISUAL = {
   CYCLE_GLOW_COLOR:       0xff2222,
   CYCLE_LOOP_THRESHOLD:   10,         // loops before we flag and pause
 
+  // Stack
+  STACK_BOX_SIZE:         1.8,    // width and depth of each stack slot box
+  STACK_BOX_HEIGHT:       0.8,    // height of each stack slot box
+  STACK_OFFSET_Y:         0.15,   // gap between stacked boxes
+
+  // Queue
+  QUEUE_SLOT_SIZE:        1.6,    // width and depth of each queue slot box
+  QUEUE_SLOT_HEIGHT:      1.2,    // height of each queue slot box
+  QUEUE_GAP:              0.2,    // horizontal gap between queue slots
+
+  // Graph
+  GRAPH_VERTEX_RADIUS:    0.55,   // sphere radius for graph vertices
+  GRAPH_VERTEX_COLOR:     0x4f8ef7,  // default vertex color (matches NODE_COLOR)
+  GRAPH_VERTEX_EMISSIVE:  0x1a3a6e,  // default vertex emissive
+  GRAPH_VISITED_COLOR:    0x4fc97e,  // green — visited vertex/edge
+  GRAPH_EDGE_DEFAULT:     0x7a8aaa,  // unvisited edge color (matches EDGE_COLOR)
+
+  // Heap
+  HEAP_MIN_COLOR:         0x5da8ff,  // blue — min-heap root
+  HEAP_MAX_COLOR:         0xff6b6b,  // red-orange — max-heap root
+
+  // Hash Table
+  HT_BUCKET_WIDTH:        2.2,    // width of each bucket box
+  HT_BUCKET_HEIGHT:       0.9,    // height of each bucket box
+  HT_BUCKET_GAP:          0.25,   // vertical gap between bucket rows
+  HT_BUCKET_COLOR:        0x4f8ef7,  // occupied bucket color
+  HT_EMPTY_COLOR:         0x2a2a3a,  // empty bucket color (dark/muted)
+
   // Sorting race bars
-  BAR_WIDTH:              0.4,
-  BAR_GAP:                0.15,
+  BAR_WIDTH:              0.9,
+  BAR_GAP:                0.2,
   BAR_COLOR_DEFAULT:      0x4f8ef7,
   BAR_COLOR_COMPARING:    0xffc44d,   // amber — currently being compared
   BAR_COLOR_SORTED:       0x4fc97e,   // green — in final position
   BAR_COLOR_PIVOT:        0xff6b6b,   // red — quicksort pivot
-
-  // Stack visual
-  STACK_BOX_SIZE:          0.9,       // width/depth of each stack box
-  STACK_BOX_HEIGHT:        0.5,       // height of each stack box
-  STACK_OFFSET_Y:          0.55,      // vertical gap between stacked boxes
-  STACK_MAX_ITEMS:         8,
-
-  // Queue visual
-  QUEUE_SLOT_SIZE:         0.8,       // width/depth of each queue slot
-  QUEUE_SLOT_HEIGHT:        0.6,
-  QUEUE_GAP:                0.1,
-  QUEUE_PTR_COLOR:          0xffc44d, // amber for front/rear pointers
-
-  // Graph visual
-  GRAPH_VERTEX_RADIUS:      0.5,
-  GRAPH_EDGE_LINE_WIDTH:    0.03,
-  GRAPH_VERTEX_COLOR:       0x7c5cfc, // purple
-  GRAPH_VISITED_COLOR:      0x4fc97e, // green
-  GRAPH_EDGE_DEFAULT:       0x5a5a7a,
-  GRAPH_VERTEX_EMISSIVE:    0x2a1a5a,
-
-  // Hash table visual
-  HT_BUCKET_WIDTH:          1.0,
-  HT_BUCKET_HEIGHT:         0.5,
-  HT_BUCKET_GAP:            0.15,
-  HT_BUCKET_COLOR:          0x6a4f8e, // purple-gray
-  HT_EMPTY_COLOR:           0x2a2a3a,
-
-  // Heap visual
-  HEAP_NODE_RADIUS:         0.5,
-  HEAP_MIN_COLOR:           0x4fc97e, // green for min-heap
-  HEAP_MAX_COLOR:           0xff6b6b, // red for max-heap
 };
-
-
-// Layout config additions are in LAYOUT below
 
 
 // -------------------------------------------------------------
@@ -220,13 +215,13 @@ export const CAMERA = {
 // -------------------------------------------------------------
 export const LAYOUT = {
   // Linked list
-  LL_NODE_SPACING:      3.2,    // horizontal gap between nodes
+  LL_NODE_SPACING:      2.8,    // horizontal gap between nodes
   LL_Y:                 0,      // y position of the list plane
-  LL_DANGLING_Y:        4.0,    // how high a dangling node floats
+  LL_DANGLING_Y:        3.5,    // how high a dangling node floats
 
   // Binary tree
-  TREE_LEVEL_HEIGHT:    3.2,    // vertical gap between levels
-  TREE_H_SPREAD:        1.8,    // horizontal spread multiplier per level
+  TREE_LEVEL_HEIGHT:    2.8,    // vertical gap between levels
+  TREE_H_SPREAD:        1.6,    // horizontal spread multiplier per level
 
   // Array
   ARRAY_SLOT_WIDTH:     1.2,
@@ -235,28 +230,29 @@ export const LAYOUT = {
   ARRAY_GAP:            0.15,
 
   // Sort race
-  SORT_RACE_SPACING:    14,     // horizontal distance between each sorter
-  SORT_BAR_MAX_HEIGHT:  5,      // tallest bar height in units
+  SORT_RACE_SPACING:    14,      // horizontal distance between each sorter
+  SORT_BAR_MAX_HEIGHT:  6,       // tallest bar height in units
+  BAR_WIDTH:            0.9,     // individual sort bar width (also used by SortRace)
+  BAR_GAP:              0.2,     // gap between sort bars
 
-  // Stack layout
-  STACK_CENTER_X:       0,
-  STACK_BASE_Y:         -2.0,
+  // Stack
+  STACK_CENTER_X:       0,       // center x position for the stack column
+  STACK_BASE_Y:        -3,       // y position of the bottom stack slot
 
-  // Queue layout
-  QUEUE_CENTER_X:       0,
-  QUEUE_Y:              0.5,
+  // Queue
+  QUEUE_Y:              0,       // y position of the queue row
 
-  // Graph layout
-  GRAPH_RADIUS:         5.0,    // radius of the circle when arranging vertices
+  // Graph
+  GRAPH_RADIUS:         5.5,     // radius of the circular vertex layout
 
-  // Hash table layout
-  HT_START_X:           -4.0,
-  HT_START_Y:           3.0,
-  HT_ROW_STEP_Y:        -1.5,   // vertical gap between bucket rows
+  // Heap
+  HEAP_LEVEL_HEIGHT:    2.8,     // vertical gap between heap levels
+  HEAP_H_SPREAD:        1.6,     // horizontal spread multiplier per level
 
-  // Heap layout — increased spacing to prevent label overlap
-  HEAP_LEVEL_HEIGHT:    3.0,
-  HEAP_H_SPREAD:        2.0,
+  // Hash Table
+  HT_START_X:          -4.0,     // leftmost bucket x position
+  HT_START_Y:           3.5,     // topmost bucket y position
+  HT_ROW_STEP_Y:       -1.4,     // y step between bucket rows (negative = downward)
 };
 
 

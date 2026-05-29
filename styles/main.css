@@ -285,6 +285,227 @@ button:focus-visible {
 ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
 
 
+/* =============================================================
+   FULLSCREEN MODE — hides UI panels, canvas takes over
+   Applied via: body.fullscreen-mode (toggled by fullscreen button)
+   ============================================================= */
+
+body.fullscreen-mode #toolbar,
+body.fullscreen-mode #status-bar,
+body.fullscreen-mode #code-panel,
+body.fullscreen-mode #panel-divider,
+body.fullscreen-mode #error-panel,
+body.fullscreen-mode #error-badge,
+body.fullscreen-mode #playback-bar,
+body.fullscreen-mode #floating-error-panel {
+  display: none !important;
+}
+
+body.fullscreen-mode #seeds-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 0;
+}
+
+body.fullscreen-mode #visualizer-area {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+body.fullscreen-mode #app-layout {
+  position: fixed;
+  inset: 0;
+}
+
+body.fullscreen-mode #status-bar {
+  display: none !important;
+}
+
+/* Exit fullscreen button */
+.fullscreen-exit-btn {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  padding: 8px 16px;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+
+.fullscreen-exit-btn:hover {
+  background: rgba(0,0,0,0.8);
+}
+
+
+/* =============================================================
+   LIGHT THEME — overrides everything above
+   Applied via: body.light-theme  (toggled by 'T' key)
+   ============================================================= */
+
+body.light-theme {
+  --bg:            #f4f4f9;
+  --bg-surface:    #ffffff;
+  --bg-raised:     #eaeaef;
+  --bg-hover:      #dddde8;
+  --bg-active:     #cccce0;
+
+  --border:        rgba(0,0,0,0.08);
+  --border-light:  rgba(0,0,0,0.14);
+  --border-active: rgba(0,0,0,0.22);
+
+  --text:          #1a1a2e;
+  --text-muted:    #5a5a7a;
+  --text-dim:      #5a5a7a;
+
+  --shadow-sm:     0 1px 4px rgba(0,0,0,0.08);
+  --shadow-md:     0 4px 16px rgba(0,0,0,0.10);
+  --shadow-lg:     0 8px 32px rgba(0,0,0,0.12);
+}
+
+/* Light toolbar background */
+body.light-theme .toolbar {
+  background: rgba(255,255,255,0.92);
+  border-bottom: 1px solid var(--border);
+}
+
+body.light-theme .toolbar__tabs-wrap::after {
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.92));
+}
+
+/* Light code panel */
+body.light-theme #code-panel {
+  background: rgba(255,255,255,0.96);
+  border-right: 1px solid var(--border);
+}
+
+body.light-theme .code-panel__header {
+  background: rgba(240,240,245,0.96);
+  border-bottom: 1px solid var(--border);
+}
+
+body.light-theme .code-panel__code-wrap {
+  background: #fafafe;
+}
+
+body.light-theme .code-panel__line-numbers {
+  background: #f0f0f5;
+  border-right: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+body.light-theme .code-panel__textarea {
+  color: var(--text);
+}
+
+body.light-theme .code-panel__section {
+  background: rgba(240,240,245,0.8);
+  border: 1px solid var(--border);
+}
+
+body.light-theme .code-panel__error-item {
+  background: rgba(255,59,59,0.04);
+}
+
+body.light-theme .code-panel__error-source {
+  background: rgba(0,0,0,0.04);
+}
+
+body.light-theme .code-panel__select {
+  background: #fff;
+  color: var(--text);
+}
+
+body.light-theme .code-panel__upload-btn,
+body.light-theme .code-panel__clear-btn,
+body.light-theme .code-panel__minimize {
+  background: #fff;
+  color: var(--text-muted);
+}
+
+body.light-theme .code-panel__upload-btn:hover,
+body.light-theme .code-panel__clear-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+/* Light playback bar */
+body.light-theme .playback-bar {
+  background: rgba(255,255,255,0.92);
+  border-top: 1px solid var(--border);
+}
+
+body.light-theme .playback-bar__btn,
+body.light-theme .playback-bar__speed-btn {
+  background: #fff;
+}
+
+body.light-theme .playback-bar__btn:hover:not(:disabled),
+body.light-theme .playback-bar__speed-btn:hover {
+  background: var(--bg-hover);
+}
+
+/* Light status bar */
+body.light-theme .status-bar {
+  background: rgba(255,255,255,0.7);
+  border-bottom: 1px solid var(--border);
+}
+
+/* Light error panel */
+body.light-theme .error-panel {
+  background: rgba(255,255,255,0.94);
+}
+
+body.light-theme .error-panel__item {
+  background: rgba(255,59,59,0.04);
+}
+
+body.light-theme .error-panel__item:hover {
+  background: rgba(255,59,59,0.08);
+}
+
+body.light-theme .error-panel__item-node {
+  background: var(--bg-raised);
+  color: var(--text-dim);
+}
+
+/* Light tooltip */
+body.light-theme .info-tooltip {
+  background: rgba(255,255,255,0.96);
+  border: 1px solid var(--border-light);
+}
+
+body.light-theme .info-tooltip__row + .info-tooltip__row {
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+body.light-theme .info-tooltip__label {
+  color: var(--text-dim);
+}
+
+body.light-theme .info-tooltip__value {
+  color: var(--text);
+}
+
+/* Light scrollbar */
+body.light-theme ::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+}
+
+body.light-theme ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-dim);
+}
+
+
 /* --- Selection --------------------------------------------- */
 ::selection {
   background: var(--accent-glow);
@@ -302,7 +523,7 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   background: var(--bg);
-  transition: opacity var(--transition-slow), visibility var(--transition-slow);
+  transition: opacity 150ms ease, visibility 150ms ease;
 }
 
 .app-loading--hidden {

@@ -179,6 +179,22 @@ export const VISUAL = {
 
 
 // -------------------------------------------------------------
+//  THEME CONFIG
+//  Used by: app.js for light/dark theme switching
+// -------------------------------------------------------------
+export const THEME = {
+  DARK: 'dark',
+  LIGHT: 'light',
+  STORAGE_KEY: 'seeds-theme',
+  // Light-mode 3D scene colors (overrides VISUAL)
+  LIGHT_BG:    0xe8e8ee,
+  LIGHT_FOG:   0xe8e8ee,
+  DARK_BG:     0x0f0f13,
+  DARK_FOG:    0x0f0f13,
+};
+
+
+// -------------------------------------------------------------
 //  CAMERA CONFIG
 //  Used by: SceneManager
 // -------------------------------------------------------------

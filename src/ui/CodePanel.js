@@ -8,6 +8,7 @@
 //    - Analyze button
 //    - Results panel with errors (type, line, message, fix)
 //    - File upload (drag & drop + button)
+//    - Auto-loads matching template when DS type is selected
 // =============================================================
 
 import eventBus from '../core/eventBus.js';
@@ -15,6 +16,24 @@ import { EVENTS } from '../core/constants.js';
 import { analyze, getTemplates } from '../analyzer/index.js';
 
 const LEFT_PANEL_ID = 'code-panel';
+
+// Maps DS type names (from analyze/DS tabs) to template IDs
+const DS_TO_TEMPLATE = {
+  linked_list:     'linked_list',
+  stack:           'stack',
+  queue:           'queue',
+  binary_tree:     'binary_tree',
+  avl_tree:        'avl_tree',
+  heap:            'heap',
+  hash_table:      'hash_table',
+  graph:           'graph',
+  doubly_list:     'doubly_list',
+  circular_list:   'linked_list',
+  circular_queue:  'circular_queue',
+  dequeue:         'dequeue',
+  array:           'array_ops',
+  sort_race:       'sorting',
+};
 
 
 class CodePanel {
@@ -241,6 +260,28 @@ class CodePanel {
     }
   }
 
+  /**
+   * Load a template that matches the given DS type name.
+   * Used when user clicks a DS tab or runs analysis.
+   */
+  _loadTemplateForType(dsType) {
+    // Skip if we don't have a mapping for this type
+    const templateId = DS_TO_TEMPLATE[dsType];
+    if (!templateId) return;
+
+    // Only update if the dropdown doesn't already match
+    if (this._templateSelect.value === templateId) return;
+
+    const templates = getTemplates();
+    const tpl = templates.find(t => t.id === templateId);
+    if (tpl) {
+      this._templateSelect.value = templateId;
+      this._codeArea.value = tpl.code;
+      this._syncLineNumbers();
+      this._clearResults();
+    }
+  }
+
 
   // -----------------------------------------------------------
   //  Line number sync
@@ -284,6 +325,10 @@ class CodePanel {
             type: result.type,
             data: result.data,
           });
+
+          // Trigger scene viewport recalculation so the visualizer
+          // properly accounts for the code panel width.
+          setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
         }
       } catch (err) {
         this._showError(`Analysis error: ${err.message}`);
@@ -472,6 +517,14 @@ class CodePanel {
     // Resize line numbers when panel toggles
     window.addEventListener('resize', () => {
       setTimeout(() => this._syncLineNumbers(), 100);
+    });
+
+    // Auto-load matching template ONLY when a DS tab is clicked (source === 'toolbar')
+    // NOT when analysis emits DS_LOADED — that would overwrite user's pasted code.
+    eventBus.on(EVENTS.DS_LOADED, ({ type, source }) => {
+      if (source === 'toolbar') {
+        this._loadTemplateForType(type);
+      }
     });
   }
 

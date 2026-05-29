@@ -11,6 +11,7 @@
 
 import * as THREE from '../../vendor/three/three.module.js';
 import { VISUAL }  from '../core/constants.js';
+import eventBus    from '../core/eventBus.js';
 
 
 // Canvas dimensions — bigger = higher quality text, still power-of-two for GPU
@@ -49,6 +50,29 @@ class LabelSprite {
 
     this._build();
     this._scene.add(this._sprite);
+
+    // Register for theme updates
+    LabelSprite._instances.add(this);
+  }
+
+
+  // -----------------------------------------------------------
+  //  Determine text color based on current theme
+  // -----------------------------------------------------------
+  _getTextColor() {
+    return document.body.classList.contains('light-theme') ? '#222222' : '#ffffff';
+  }
+
+  _getGlowColor() {
+    return document.body.classList.contains('light-theme')
+      ? 'rgba(255,255,255,0.6)'
+      : 'rgba(0,0,0,0.85)';
+  }
+
+  _getShadowColor() {
+    return document.body.classList.contains('light-theme')
+      ? 'rgba(255,255,255,0.3)'
+      : 'rgba(0,0,0,0.3)';
   }
 
 
@@ -58,10 +82,13 @@ class LabelSprite {
   _draw(ctx, text) {
     ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
 
-    // Subtle semi-transparent glow behind text for readability without the heavy pill
-    // Strong text shadow for crisp readability
+    const textColor   = this._getTextColor();
+    const glowColor   = this._getGlowColor();
+    const shadowColor = this._getShadowColor();
+
+    // Subtle glow/shadow behind text for crisp readability
     ctx.save();
-    ctx.shadowColor   = 'rgba(0,0,0,0.85)';
+    ctx.shadowColor   = glowColor;
     ctx.shadowBlur    = 8;
     ctx.shadowOffsetX = 1;
     ctx.shadowOffsetY = 1;
@@ -71,18 +98,16 @@ class LabelSprite {
     ctx.textAlign    = 'center';
     ctx.textBaseline = 'middle';
     
-    // Draw subtle dark glow behind text (multiple layers for glow effect)
-    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+    // Draw subtle glow behind text (multiple layers)
+    ctx.fillStyle = shadowColor;
     ctx.shadowBlur = 20;
     ctx.fillText(text, CANVAS_W / 2, CANVAS_H / 2);
     
-    // Main text - crisp white with shadow
+    // Main text - crisp with appropriate contrast for theme
     ctx.shadowBlur = 6;
-    ctx.fillStyle  = '#ffffff';
+    ctx.fillStyle  = textColor;
     ctx.fillText(text, CANVAS_W / 2, CANVAS_H / 2);
     ctx.restore();
-
-    // Remove the pill/background
   }
 
 
@@ -113,6 +138,18 @@ class LabelSprite {
 
     // Scale sprite to appropriate world-unit size. 512:128 = 4:1 ratio
     this._sprite.scale.set(3.0, 0.75, 1);
+  }
+
+
+  // -----------------------------------------------------------
+  //  Redraw texture (called when theme changes)
+  // -----------------------------------------------------------
+  _redraw() {
+    if (!this._texture) return;
+    const canvas = this._texture.image;
+    const ctx    = canvas.getContext('2d');
+    this._draw(ctx, this._text);
+    this._texture.needsUpdate = true;
   }
 
 
@@ -168,6 +205,7 @@ class LabelSprite {
     }
     this._texture = null;
     this._sprite  = null;
+    LabelSprite._instances.delete(this);
   }
 
 
@@ -179,6 +217,30 @@ class LabelSprite {
     return new LabelSprite(text, scene);
   }
 }
+
+
+// ---------------------------------------------------------------
+//  Static instance registry for theme-aware redrawing
+// ---------------------------------------------------------------
+/** @type {Set<LabelSprite>} */
+LabelSprite._instances = new Set();
+
+// Watch for theme changes and redraw all active labels.
+// Uses setTimeout(0) to defer after app.js _setTheme() has toggled the CSS class,
+// so _getTextColor() reads the correct theme state.
+let _themeBound = false;
+function _ensureThemeBinding() {
+  if (_themeBound) return;
+  _themeBound = true;
+  eventBus.on('theme:set', () => {
+    setTimeout(() => {
+      for (const label of LabelSprite._instances) {
+        label._redraw();
+      }
+    }, 0);
+  });
+}
+_ensureThemeBinding();
 
 
 export default LabelSprite;

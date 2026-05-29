@@ -30,10 +30,21 @@ const DEFAULT_META = { icon: '⚠', label: 'Error', color: '#ff6b6b' };
 
 class ErrorPanel {
   constructor(containerEl) {
-    this._container = containerEl;
     this._errors    = [];
     this._items     = [];
     this._collapsed = false;
+
+    // If no container passed, create one (app.js calls new ErrorPanel() without args)
+    if (containerEl) {
+      this._container = containerEl;
+    } else {
+      this._container = document.getElementById('error-panel');
+      if (!this._container) {
+        this._container = document.createElement('div');
+        this._container.id = 'error-panel';
+        document.body.appendChild(this._container);
+      }
+    }
 
     this._build();
     this._bindEvents();

@@ -1,7 +1,7 @@
 // app-v2.js — Real App with try/catch around _init() to surface the crash
 
 import eventBus           from './eventBus.js';
-import { EVENTS, DS_TYPES, APP } from './constants.js';
+import { EVENTS, DS_TYPES, APP, THEME } from './constants.js';
 
 import SceneManager       from '../renderer/SceneManager.js';
 import AnimationLoop      from '../renderer/AnimationLoop.js';
@@ -42,6 +42,21 @@ function showCrash(step, err) {
   }
 }
 
+function showCrash(step, err) {
+  console.error(`[SeeDS] CRASH at: ${step}`, err);
+  const overlay = document.getElementById('app-loading');
+  if (overlay) {
+    overlay.innerHTML = `
+      <div style="max-width:600px;text-align:left;padding:32px">
+        <h2 style="color:#ff3b3b;font-family:monospace;margin-bottom:16px">💥 Crashed at: <code>${step}</code></h2>
+        <pre style="background:#111;border:1px solid #333;padding:16px;border-radius:8px;color:#ff8888;font-size:12px;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow:auto">${err?.stack || err}</pre>
+        <p style="color:#5b8ff7;font-family:monospace;margin-top:16px;font-size:13px">Also check F12 → Console for full details.</p>
+      </div>
+    `;
+  }
+}
+
+
 class App {
   constructor() {
     this._scene      = null;
@@ -51,7 +66,8 @@ class App {
     this._activeType      = null;
     this._toolbar    = null;
     this._playbar    = null;
-    this._tooltip    = null;
+    this._codePanel  = null;
+    this._statusBar  = null;
     this._errorPanel = null;
     this._raycaster  = new THREE.Raycaster();
     this._mouse      = new THREE.Vector2(-9999, -9999);
@@ -196,9 +212,9 @@ class App {
   _hideLoading() {
     const overlay = document.getElementById('app-loading');
     if (overlay) {
+      overlay.classList.add('app-loading--hidden');
       setTimeout(() => {
-        overlay.classList.add('app-loading--hidden');
-        setTimeout(() => overlay.remove(), 400);
+        if (overlay.parentNode) overlay.remove();
       }, 200);
     }
   }
@@ -208,16 +224,10 @@ class App {
     canvas.addEventListener('mousemove', (e) => {
       this._mouse.x =  (e.clientX / window.innerWidth)  * 2 - 1;
       this._mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      this._lastMouseX = e.clientX;
-      this._lastMouseY = e.clientY;
     });
     canvas.addEventListener('mouseleave', () => {
-      this._mouse.set(-9999, -9999);
-      eventBus.emit(EVENTS.TOOLTIP_HIDE);
-      if (this._hoveredNode) {
-        this._hoveredNode.setHovered(false);
-        this._hoveredNode = null;
-      }
+      this._mouse.x = -9999;
+      this._mouse.y = -9999;
     });
     canvas.addEventListener('dblclick', () => {
       if (this._hoveredNode) {
@@ -266,4 +276,6 @@ class App {
 
 document.addEventListener('DOMContentLoaded', () => {
   window._seedsApp = new App();
+  // Fix initial viewport: SceneManager._onResize ran before CodePanel was built
+  setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
 });

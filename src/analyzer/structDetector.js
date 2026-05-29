@@ -69,26 +69,28 @@ const FUNC_PATTERNS = {
 };
 
 // Field name patterns for self-referencing structs
+// Keys are matched as prefixes against field names (e.g. 'adj' matches 'adjLists')
 const FIELD_PATTERNS = {
-  next:   { type: DS_TYPES.LINKED_LIST, weight: 15 },
-  prev:   { type: DS_TYPES.LINKED_LIST, weight: 10 }, // doubly linked
-  left:   { type: DS_TYPES.BINARY_TREE, weight: 15 },
-  right:  { type: DS_TYPES.BINARY_TREE, weight: 15 },
-  key:    { type: DS_TYPES.BINARY_TREE, weight: 5 },
-  data:   { type: DS_TYPES.LINKED_LIST, weight: 3 },
-  head:   { type: DS_TYPES.LINKED_LIST, weight: 5 },
-  top:    { type: DS_TYPES.STACK,       weight: 10 },
-  bottom: { type: DS_TYPES.STACK,       weight: 5 },
-  front:  { type: DS_TYPES.QUEUE,       weight: 10 },
-  rear:   { type: DS_TYPES.QUEUE,       weight: 10 },
-  edge:   { type: DS_TYPES.GRAPH,       weight: 8 },
-  adj:    { type: DS_TYPES.GRAPH,       weight: 10 },
-  vertex: { type: DS_TYPES.GRAPH,       weight: 8 },
-  table:  { type: DS_TYPES.HASH_TABLE,  weight: 8 },
-  bucket: { type: DS_TYPES.HASH_TABLE,  weight: 8 },
-  height: { type: DS_TYPES.AVL_TREE,    weight: 8 },
-  priority: { type: DS_TYPES.HEAP,      weight: 10 },
-  array:  { type: DS_TYPES.ARRAY,       weight: 5 },
+  next:     { type: DS_TYPES.LINKED_LIST, weight: 15 },
+  prev:     { type: DS_TYPES.LINKED_LIST, weight: 10 }, // doubly linked
+  left:     { type: DS_TYPES.BINARY_TREE, weight: 15 },
+  right:    { type: DS_TYPES.BINARY_TREE, weight: 15 },
+  key:      { type: DS_TYPES.BINARY_TREE, weight: 5 },
+  data:     { type: DS_TYPES.LINKED_LIST, weight: 3 },
+  head:     { type: DS_TYPES.LINKED_LIST, weight: 5 },
+  top:      { type: DS_TYPES.STACK,       weight: 10 },
+  bottom:   { type: DS_TYPES.STACK,       weight: 5 },
+  front:    { type: DS_TYPES.QUEUE,       weight: 10 },
+  rear:     { type: DS_TYPES.QUEUE,       weight: 10 },
+  edge:     { type: DS_TYPES.GRAPH,       weight: 8 },
+  adj:      { type: DS_TYPES.GRAPH,       weight: 10 },  // matches adjLists, adjNodes
+  vertex:   { type: DS_TYPES.GRAPH,       weight: 8 },
+  visited:  { type: DS_TYPES.GRAPH,       weight: 6 },
+  table:    { type: DS_TYPES.HASH_TABLE,  weight: 8 },
+  bucket:   { type: DS_TYPES.HASH_TABLE,  weight: 8 },
+  height:   { type: DS_TYPES.AVL_TREE,    weight: 8 },
+  priority: { type: DS_TYPES.HEAP,        weight: 10 },
+  array:    { type: DS_TYPES.ARRAY,       weight: 5 },
 };
 
 
@@ -106,14 +108,38 @@ export function detect(parseResult) {
   // Initialize scores for all DS types
   for (const type of Object.values(DS_TYPES)) {
     scores[type] = 0;
-    breakdown[type] = { structScore: 0, funcScore: 0, fieldScore: 0, mallocScore: 0, total: 0 };
+    breakdown[type] = { structScore: 0, funcScore: 0, fieldScore: 0, mallocScore: 0, reinforcement: 0, total: 0 };
+  }
+
+  // Build a reverse map: DS type → list of field keys that map to it
+  const typeFieldKeys = {};
+  for (const [key, val] of Object.entries(FIELD_PATTERNS)) {
+    if (!typeFieldKeys[val.type]) typeFieldKeys[val.type] = [];
+    typeFieldKeys[val.type].push(key);
+  }
+
+  // Check if a field name matches any pattern key (prefix match)
+  function matchFieldPattern(fieldName) {
+    for (const [key, pattern] of Object.entries(FIELD_PATTERNS)) {
+      // Check prefix match: e.g. 'adj' matches 'adjLists', 'adjNodes'
+      if (fieldName === key || fieldName.startsWith(key)) {
+        return pattern;
+      }
+    }
+    return null;
   }
 
   // ---- Score from struct definitions ----
   for (const st of structs) {
+    // Check if this struct has graph-related fields
+    const hasGraphFields = st.fields.some(f => {
+      const p = matchFieldPattern(f.name);
+      return p && p.type === DS_TYPES.GRAPH;
+    });
+
     for (const field of st.fields) {
-      // Check field name hints
-      const pattern = FIELD_PATTERNS[field.name];
+      // Check field name hints (using prefix matching)
+      const pattern = matchFieldPattern(field.name);
       if (pattern) {
         scores[pattern.type] += pattern.weight;
         breakdown[pattern.type].fieldScore += pattern.weight;
@@ -123,6 +149,11 @@ export function detect(parseResult) {
       if (field.isPointer) {
         // Pointer field with type matching struct name → self-reference
         if (st.name && field.type.includes(st.name)) {
+          // If struct has graph-related fields, attribute self-ref to GRAPH too
+          if (hasGraphFields) {
+            scores[DS_TYPES.GRAPH] += WEIGHTS.STRUCT_MATCH;
+            breakdown[DS_TYPES.GRAPH].structScore += WEIGHTS.STRUCT_MATCH;
+          }
           scores[DS_TYPES.LINKED_LIST] += WEIGHTS.STRUCT_MATCH;
           breakdown[DS_TYPES.LINKED_LIST].structScore += WEIGHTS.STRUCT_MATCH;
         }
@@ -134,6 +165,11 @@ export function detect(parseResult) {
       // Singly linked / stack / queue
       scores[DS_TYPES.LINKED_LIST] += 5;
       breakdown[DS_TYPES.LINKED_LIST].structScore += 5;
+      // If graph-related fields, also give to GRAPH
+      if (hasGraphFields) {
+        scores[DS_TYPES.GRAPH] += 5;
+        breakdown[DS_TYPES.GRAPH].structScore += 5;
+      }
     } else if (st.ptrToSelf >= 2) {
       // Doubly linked (next + prev) or tree (left + right)
       scores[DS_TYPES.LINKED_LIST] += 5;
@@ -146,6 +182,11 @@ export function detect(parseResult) {
     if (st.fields.length <= 3 && st.ptrToSelf >= 1) {
       scores[DS_TYPES.LINKED_LIST] += 5;
       breakdown[DS_TYPES.LINKED_LIST].structScore += 5;
+      // If graph-related fields, also give to GRAPH
+      if (hasGraphFields) {
+        scores[DS_TYPES.GRAPH] += 5;
+        breakdown[DS_TYPES.GRAPH].structScore += 5;
+      }
     }
     // Larger struct with 2 pointers suggests tree
     if (st.ptrToSelf >= 2) {
@@ -193,6 +234,19 @@ export function detect(parseResult) {
     breakdown[DS_TYPES.LINKED_LIST].mallocScore += WEIGHTS.MALLOC_PATTERN;
     scores[DS_TYPES.BINARY_TREE] += WEIGHTS.MALLOC_PATTERN;
     breakdown[DS_TYPES.BINARY_TREE].mallocScore += WEIGHTS.MALLOC_PATTERN;
+  }
+
+  // ---- Reinforcement: boost types where BOTH function AND field evidence exists ----
+  // This prevents struct internals (like a 'next' pointer in AdjNode) from
+  // overwhelming stronger functional signals (like 'addEdge' + 'createGraph').
+  for (const type of Object.values(DS_TYPES)) {
+    const { funcScore, fieldScore } = breakdown[type];
+    if (funcScore > 0 && fieldScore > 0) {
+      // Combined signal strength: the more evidence from both sides, the bigger the boost
+      const bonus = Math.round((funcScore + fieldScore) * 0.5);
+      scores[type] += bonus;
+      breakdown[type].reinforcement = bonus;
+    }
   }
 
   // ---- Determine best match ----

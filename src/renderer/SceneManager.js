@@ -34,6 +34,8 @@ class SceneManager {
     this._buildLights();
     this._buildControls();
     this._bindResize();
+    // Run resize immediately so the viewport accounts for the code panel
+    this._onResize();
   }
 
   _buildRenderer() {
@@ -48,7 +50,7 @@ class SceneManager {
     const { w: initW, h: initH } = this._getCanvasSize();
     this._renderer.setSize(initW, initH);
     this._renderer.shadowMap.enabled = true;
-    this._renderer.shadowMap.type    = THREE.PCFSoftShadowMap;
+    this._renderer.shadowMap.type    = THREE.PCFShadowMap;
     // Correct color rendering for modern Three.js
     this._renderer.outputColorSpace   = THREE.SRGBColorSpace;
     this._renderer.toneMapping        = THREE.ACESFilmicToneMapping;
@@ -231,6 +233,19 @@ class SceneManager {
       this._scene.remove(obj);
     }
   }
+
+  /**
+   * Set scene background + fog color (used by theme switching).
+   */
+  setBackground(bgColor, fogColor) {
+    if (this._scene) {
+      this._scene.background = new THREE.Color(bgColor);
+      if (this._scene.fog) {
+        this._scene.fog.color.setHex(fogColor);
+      }
+    }
+  }
+
 
   // Getters — other modules use these, never instantiate their own
   getScene()    { return this._scene;    }

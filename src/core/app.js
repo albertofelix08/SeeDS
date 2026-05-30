@@ -144,6 +144,47 @@ class App {
       }
     });
     eventBus.on('camera:reset', () => { this._scene.resetCamera(); });
+
+    // Theme toggle (light / dark)
+    eventBus.on('theme:set', ({ theme }) => {
+      const isLight = theme === THEME.LIGHT;
+      document.body.classList.toggle('light-theme', isLight);
+      // Update 3D scene background & fog colour to match
+      this._scene.setBackground(
+        isLight ? THEME.LIGHT_BG  : THEME.DARK_BG,
+        isLight ? THEME.LIGHT_FOG : THEME.DARK_FOG
+      );
+      // Persist preference
+      try { localStorage.setItem(THEME.STORAGE_KEY, theme); } catch {}
+    });
+
+    // Restore saved theme on boot
+    try {
+      const saved = localStorage.getItem(THEME.STORAGE_KEY);
+      if (saved === THEME.LIGHT) {
+        document.body.classList.add('light-theme');
+        this._scene.setBackground(THEME.LIGHT_BG, THEME.LIGHT_FOG);
+        // Sync toolbar icon
+        eventBus.emit('theme:set', { theme: THEME.LIGHT });
+      }
+    } catch {}
+
+    // Fullscreen toggle
+    const exitBtn = document.createElement('button');
+    exitBtn.className   = 'fullscreen-exit-btn';
+    exitBtn.textContent = '✕ Exit Fullscreen';
+    exitBtn.style.display = 'none';
+    exitBtn.addEventListener('click', () => {
+      eventBus.emit('fullscreen:set', { enabled: false });
+    });
+    document.body.appendChild(exitBtn);
+
+    eventBus.on('fullscreen:set', ({ enabled }) => {
+      document.body.classList.toggle('fullscreen-mode', enabled);
+      exitBtn.style.display = enabled ? 'block' : 'none';
+      window.dispatchEvent(new Event('resize'));
+    });
+
     eventBus.on(EVENTS.ERROR_SELECTED, ({ error }) => {
       if (!error.nodeId || !this._activeStructure) return;
       const nodeMesh = this._activeStructure._nodes?.get(error.nodeId);

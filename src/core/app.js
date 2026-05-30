@@ -42,19 +42,6 @@ function showCrash(step, err) {
   }
 }
 
-function showCrash(step, err) {
-  console.error(`[SeeDS] CRASH at: ${step}`, err);
-  const overlay = document.getElementById('app-loading');
-  if (overlay) {
-    overlay.innerHTML = `
-      <div style="max-width:600px;text-align:left;padding:32px">
-        <h2 style="color:#ff3b3b;font-family:monospace;margin-bottom:16px">💥 Crashed at: <code>${step}</code></h2>
-        <pre style="background:#111;border:1px solid #333;padding:16px;border-radius:8px;color:#ff8888;font-size:12px;white-space:pre-wrap;word-break:break-all;max-height:300px;overflow:auto">${err?.stack || err}</pre>
-        <p style="color:#5b8ff7;font-family:monospace;margin-top:16px;font-size:13px">Also check F12 → Console for full details.</p>
-      </div>
-    `;
-  }
-}
 
 
 class App {

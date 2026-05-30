@@ -1,7 +1,6 @@
 /* =============================================================
    SeeDS — code-panel.css
-   Permanent left-side Code Analyzer panel.
-   Monaco editor replaces the old textarea.
+   Custom syntax-highlighted editor. No Ace, no Monaco.
    ============================================================= */
 
 
@@ -25,6 +24,8 @@
   align-items: center;
   gap: 8px;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .code-panel__logo {
@@ -33,6 +34,7 @@
   justify-content: center;
   width: 22px;
   height: 22px;
+  flex-shrink: 0;
   background: linear-gradient(135deg, var(--accent), #a78bfa);
   color: #fff;
   border-radius: var(--radius-sm);
@@ -45,13 +47,62 @@
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
+}
+
+.code-panel__minimize {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-raised);
+  color: var(--text-muted);
+  font-size: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+  padding: 0;
+}
+
+.code-panel__minimize:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+
+/* --- Minimized state --------------------------------------- */
+/* When minimized, shrink to header only. Body is hidden via
+   max-height transition so it animates and doesn't vanish. */
+.code-panel--minimized {
+  width: 40px !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+}
+
+.code-panel--minimized .code-panel__body {
+  display: none;
+}
+
+.code-panel--minimized .code-panel__brand span:last-child,
+.code-panel--minimized .code-panel__brand {
+  overflow: hidden;
+  width: 0;
+  opacity: 0;
+}
+
+.code-panel--minimized .code-panel__header {
+  padding: 8px 6px;
+  justify-content: center;
 }
 
 
 /* --- Body -------------------------------------------------- */
 .code-panel__body {
   flex: 1 1 0;
-  height: 0;          /* allows flex children to fill with flex-grow */
+  height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -91,9 +142,7 @@
   transition: border-color var(--transition);
 }
 
-.code-panel__select:focus {
-  border-color: var(--accent);
-}
+.code-panel__select:focus { border-color: var(--accent); }
 
 .code-panel__upload-btn {
   padding: 4px 8px;
@@ -114,7 +163,7 @@
 }
 
 
-/* --- Monaco editor container ------------------------------- */
+/* --- Editor label ------------------------------------------ */
 .code-panel__editor-label {
   font-size: 10px;
   color: var(--text-muted);
@@ -123,43 +172,117 @@
   flex-shrink: 0;
 }
 
-.code-panel__monaco-wrap {
+
+/* =============================================================
+   SYNTAX EDITOR
+   Three-layer stack inside .code-panel__editor-wrap:
+     1. .code-panel__line-numbers  (left gutter)
+     2. .code-panel__highlight     (coloured pre, pointer-events none)
+     3. .code-panel__textarea      (transparent, on top, captures input)
+   ============================================================= */
+
+.code-panel__editor-wrap {
   flex: 1 1 0;
-  height: 0;          /* flex children need explicit 0 base so flex-grow fills correctly */
   min-height: 120px;
+  display: flex;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   overflow: hidden;
   background: #0d0d14;
-  transition: border-color var(--transition);
   position: relative;
+  transition: border-color var(--transition);
 }
 
-.code-panel__monaco-wrap:focus-within {
+.code-panel__editor-wrap:focus-within {
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(91,142,247,0.1);
+  box-shadow: 0 0 0 1px rgba(91,143,247,0.10);
 }
 
-/* Ace mounts into this div — must fill the wrap */
-#ace-editor-container {
-  width: 100%;
-  height: 100%;
+/* Line numbers gutter */
+.code-panel__line-numbers {
+  flex-shrink: 0;
+  width: 38px;
+  padding: 10px 0;
+  background: #0a0a10;
+  border-right: 1px solid rgba(255,255,255,0.04);
+  overflow: hidden;
+  user-select: none;
+  pointer-events: none;
+  text-align: right;
+}
+
+.code-panel__line-numbers div {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.65;
+  color: #2e3150;
+  padding-right: 8px;
+  height: 1.65em;
+}
+
+/* Highlighted pre (read-only backdrop) */
+.code-panel__highlight {
   position: absolute;
-  inset: 0;
+  top: 0;
+  left: 38px;          /* matches line-numbers width */
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 10px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.65;
+  color: #e8ecf8;
+  white-space: pre;
+  overflow: auto;
+  pointer-events: none;
+  background: transparent;
+  tab-size: 4;
+  border: none;
+  outline: none;
+  /* Scrollbar hidden on the backdrop — only textarea scrollbar shows */
+  scrollbar-width: none;
+}
+.code-panel__highlight::-webkit-scrollbar { display: none; }
+
+/* Transparent textarea on top */
+.code-panel__textarea {
+  position: absolute;
+  top: 0;
+  left: 38px;
+  right: 0;
+  bottom: 0;
+  padding: 10px 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.65;
+  color: transparent;            /* text is invisible — highlight shows through */
+  caret-color: #5b8ff7;          /* cursor is still visible */
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  tab-size: 4;
+  white-space: pre;
+  overflow: auto;
+  z-index: 1;
 }
 
-/* Ace editor overrides */
-#ace-editor-container .ace_editor {
-  width: 100% !important;
-  height: 100% !important;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', monospace !important;
-  font-size: 12px !important;
-  line-height: 1.7 !important;
+.code-panel__textarea::selection {
+  background: rgba(91,143,247,0.30);
+  color: transparent;
 }
 
-/* Slim scrollbars */
-#ace-editor-container .ace_scrollbar-v { width: 6px !important; }
-#ace-editor-container .ace_scrollbar-h { height: 6px !important; }
+
+/* --- Syntax token colours (dark) --------------------------- */
+.hl-keyword  { color: #7c9ef0; font-weight: 600; }
+.hl-type     { color: #4fc97e; }
+.hl-func     { color: #85b5ff; }
+.hl-string   { color: #ffc44d; }
+.hl-number   { color: #ff9f7e; }
+.hl-comment  { color: #3a4060; font-style: italic; }
+.hl-preproc  { color: #a78bfa; }
+.hl-macro    { color: #e0a0ff; }
 
 
 /* --- Action row -------------------------------------------- */
@@ -181,8 +304,6 @@
   cursor: pointer;
   transition: all var(--transition);
   letter-spacing: 0.02em;
-  position: relative;
-  overflow: hidden;
 }
 
 .code-panel__analyze-btn:hover:not(:disabled) {
@@ -191,9 +312,7 @@
   transform: translateY(-1px);
 }
 
-.code-panel__analyze-btn:active:not(:disabled) {
-  transform: translateY(0);
-}
+.code-panel__analyze-btn:active:not(:disabled) { transform: translateY(0); }
 
 .code-panel__analyze-btn:disabled {
   opacity: 0.5;
@@ -251,8 +370,6 @@
   gap: 6px;
 }
 
-
-/* --- Summary grid ------------------------------------------ */
 .code-panel__summary-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -267,19 +384,11 @@
   padding: 2px 0;
 }
 
-.code-panel__summary-label {
-  font-size: 10px;
-  color: var(--text-dim);
-}
-
-.code-panel__summary-value {
-  font-size: 11px;
-  font-family: var(--font-mono);
-  color: var(--text);
-}
+.code-panel__summary-label { font-size: 10px; color: var(--text-dim); }
+.code-panel__summary-value { font-size: 11px; font-family: var(--font-mono); color: var(--text); }
 
 .code-panel__ds-badge {
-  background: rgba(91, 142, 247, 0.12);
+  background: rgba(91,142,247,0.12);
   color: var(--accent-hover);
   padding: 1px 6px;
   border-radius: 3px;
@@ -289,8 +398,6 @@
   letter-spacing: 0.03em;
 }
 
-
-/* --- Confidence bar ---------------------------------------- */
 .code-panel__confidence-bar {
   height: 3px;
   background: var(--bg-raised);
@@ -304,42 +411,25 @@
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-
-/* --- Error list -------------------------------------------- */
-.code-panel__ok-badge {
-  font-size: 10px;
-  color: var(--success);
-  font-weight: 500;
-}
+.code-panel__ok-badge { font-size: 10px; color: var(--success); font-weight: 500; }
 
 .code-panel__error-count-badge {
   font-size: 9px;
-  background: rgba(255, 59, 59, 0.15);
+  background: rgba(255,59,59,0.15);
   color: var(--error);
   padding: 1px 6px;
   border-radius: 8px;
   font-weight: 600;
 }
 
-.code-panel__no-errors {
-  font-size: 11px;
-  color: var(--success);
-  padding: 3px 0;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
+.code-panel__no-errors { font-size: 11px; color: var(--success); padding: 3px 0; }
 
-.code-panel__error-list {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+.code-panel__error-list { display: flex; flex-direction: column; gap: 4px; }
 
 .code-panel__error-item {
   padding: 7px 9px;
-  background: rgba(255, 59, 59, 0.03);
-  border: 1px solid rgba(255, 59, 59, 0.08);
+  background: rgba(255,59,59,0.03);
+  border: 1px solid rgba(255,59,59,0.08);
   border-left: 3px solid var(--error);
   border-radius: var(--radius-sm);
   cursor: pointer;
@@ -347,7 +437,7 @@
 }
 
 .code-panel__error-item:hover {
-  background: rgba(255, 59, 59, 0.06);
+  background: rgba(255,59,59,0.06);
   transform: translateX(2px);
 }
 
@@ -358,23 +448,14 @@
   margin-bottom: 3px;
 }
 
-.code-panel__error-sev {
-  font-size: 12px;
-  flex-shrink: 0;
-}
-
-.code-panel__error-type {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text);
-  flex: 1;
-}
+.code-panel__error-sev  { font-size: 12px; flex-shrink: 0; }
+.code-panel__error-type { font-size: 11px; font-weight: 600; color: var(--text); flex: 1; }
 
 .code-panel__error-line {
   font-size: 9px;
   font-family: var(--font-mono);
   color: var(--accent);
-  background: rgba(91, 142, 247, 0.08);
+  background: rgba(91,142,247,0.08);
   padding: 1px 5px;
   border-radius: 3px;
 }
@@ -389,81 +470,70 @@
   border-radius: 3px;
 }
 
-.code-panel__error-msg {
-  font-size: 10px;
-  color: var(--text-muted);
-  line-height: 1.5;
-  margin-bottom: 3px;
-}
+.code-panel__error-msg    { font-size: 10px; color: var(--text-muted); line-height: 1.5; margin-bottom: 3px; }
+.code-panel__error-source { background: rgba(0,0,0,0.3); border-radius: 3px; padding: 3px 5px; margin-bottom: 3px; }
+.code-panel__error-source code { font-family: var(--font-mono); font-size: 10px; color: var(--text); white-space: pre-wrap; word-break: break-all; }
+.code-panel__error-fix    { font-size: 10px; color: var(--warn); line-height: 1.4; padding: 2px 0; }
 
-.code-panel__error-source {
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: 3px;
-  padding: 3px 5px;
-  margin-bottom: 3px;
-}
+.code-panel__parse-errors { display: flex; flex-direction: column; gap: 3px; }
+.code-panel__parse-item   { font-size: 10px; color: var(--warn); padding: 3px 6px; background: rgba(255,184,77,0.04); border-radius: 3px; }
 
-.code-panel__error-source code {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--text);
-  white-space: pre-wrap;
-  word-break: break-all;
-}
+.code-panel__error-msg-box { padding: 10px; text-align: center; color: var(--error); font-size: 12px; }
+.code-panel__error-icon    { font-size: 16px; display: block; margin-bottom: 5px; }
 
-.code-panel__error-fix {
-  font-size: 10px;
-  color: var(--warn);
-  line-height: 1.4;
-  padding: 2px 0;
-}
-
-
-/* --- Parse errors ------------------------------------------ */
-.code-panel__parse-errors {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.code-panel__parse-item {
-  font-size: 10px;
-  color: var(--warn);
-  padding: 3px 6px;
-  background: rgba(255, 184, 77, 0.04);
-  border-radius: 3px;
-}
-
-
-/* --- General error message --------------------------------- */
-.code-panel__error-msg-box {
-  padding: 10px;
-  text-align: center;
-  color: var(--error);
-  font-size: 12px;
-}
-
-.code-panel__error-icon {
-  font-size: 16px;
-  display: block;
-  margin-bottom: 5px;
-}
-
-
-/* --- Drag & drop highlight --------------------------------- */
 .code-panel--drag-over {
   border-color: var(--accent) !important;
-  box-shadow: inset 0 0 20px rgba(91, 142, 247, 0.08);
+  box-shadow: inset 0 0 20px rgba(91,142,247,0.08);
 }
 
-
-/* --- Scrollbar (within panel) ------------------------------ */
 #code-panel ::-webkit-scrollbar       { width: 4px; height: 4px; }
 #code-panel ::-webkit-scrollbar-track { background: transparent; }
-#code-panel ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.06);
-  border-radius: 3px;
+#code-panel ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 3px; }
+#code-panel ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.12); }
+
+
+/* =============================================================
+   LIGHT THEME overrides
+   ============================================================= */
+
+body.light-theme .code-panel__header {
+  background: rgba(245, 245, 250, 0.98);
 }
-#code-panel ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.12);
+
+body.light-theme .code-panel__editor-wrap {
+  background: #fafafe;
+  border-color: var(--border);
 }
+
+body.light-theme .code-panel__line-numbers {
+  background: #f0f0f6;
+  border-right-color: var(--border);
+}
+
+body.light-theme .code-panel__line-numbers div { color: #aaaacc; }
+
+body.light-theme .code-panel__highlight { color: #1a1a2e; }
+
+body.light-theme .code-panel__textarea  { caret-color: #3366dd; }
+
+body.light-theme .code-panel__textarea::selection { background: rgba(91,143,247,0.20); }
+
+/* Syntax token colours (light) */
+body.light-theme .hl-keyword  { color: #2255cc; }
+body.light-theme .hl-type     { color: #1a7a40; }
+body.light-theme .hl-func     { color: #3366bb; }
+body.light-theme .hl-string   { color: #b05a00; }
+body.light-theme .hl-number   { color: #c04000; }
+body.light-theme .hl-comment  { color: #8888aa; }
+body.light-theme .hl-preproc  { color: #7733aa; }
+body.light-theme .hl-macro    { color: #994499; }
+
+body.light-theme .code-panel__section { background: rgba(240,240,245,0.8); }
+body.light-theme .code-panel__error-item { background: rgba(255,59,59,0.04); }
+body.light-theme .code-panel__error-source { background: rgba(0,0,0,0.04); }
+body.light-theme .code-panel__select { background: #fff; color: var(--text); }
+body.light-theme .code-panel__upload-btn,
+body.light-theme .code-panel__clear-btn,
+body.light-theme .code-panel__minimize { background: #fff; color: var(--text-muted); }
+body.light-theme .code-panel__upload-btn:hover,
+body.light-theme .code-panel__clear-btn:hover { background: var(--bg-hover); color: var(--text); }

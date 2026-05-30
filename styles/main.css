@@ -382,60 +382,10 @@ body.light-theme .toolbar__tabs-wrap::after {
   background: linear-gradient(to right, transparent, rgba(255,255,255,0.92));
 }
 
-/* Light code panel */
+/* Light code panel — styles live in code-panel.css */
 body.light-theme #code-panel {
   background: rgba(255,255,255,0.96);
   border-right: 1px solid var(--border);
-}
-
-body.light-theme .code-panel__header {
-  background: rgba(240,240,245,0.96);
-  border-bottom: 1px solid var(--border);
-}
-
-body.light-theme .code-panel__code-wrap {
-  background: #fafafe;
-}
-
-body.light-theme .code-panel__line-numbers {
-  background: #f0f0f5;
-  border-right: 1px solid var(--border);
-  color: var(--text-dim);
-}
-
-body.light-theme .code-panel__textarea {
-  color: var(--text);
-}
-
-body.light-theme .code-panel__section {
-  background: rgba(240,240,245,0.8);
-  border: 1px solid var(--border);
-}
-
-body.light-theme .code-panel__error-item {
-  background: rgba(255,59,59,0.04);
-}
-
-body.light-theme .code-panel__error-source {
-  background: rgba(0,0,0,0.04);
-}
-
-body.light-theme .code-panel__select {
-  background: #fff;
-  color: var(--text);
-}
-
-body.light-theme .code-panel__upload-btn,
-body.light-theme .code-panel__clear-btn,
-body.light-theme .code-panel__minimize {
-  background: #fff;
-  color: var(--text-muted);
-}
-
-body.light-theme .code-panel__upload-btn:hover,
-body.light-theme .code-panel__clear-btn:hover {
-  background: var(--bg-hover);
-  color: var(--text);
 }
 
 /* Light playback bar */
